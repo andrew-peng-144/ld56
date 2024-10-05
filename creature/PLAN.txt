@@ -1,0 +1,14 @@
+
+
+- (or just shapes) make 5~10 8x8 test creatures
+- animate very basically
+- make simple projectiles
+- use TEXTURE PACKER. have a folder for raw assets then one for compiled
+
+- start writing js engine
+- use libraries for most calculations, code is for organization
+- organization sceheme: basic OOP with game entity parent
+
+- SCROLLING MAP
+- BUTTONS ON MAP
+

@@ -1,0 +1,26 @@
+{
+  "bundles": [
+    {
+      "name": "load-screen",
+      "assets": [
+        {
+          "alias": "bar",
+          "src": "assets/1/bar234423324.png"
+        }
+      ]
+    },
+    {
+      "name": "game-screen",
+      "assets": [
+        {
+          "alias": "button123",
+          "src": "assets/1/button123.png"
+        },
+        {
+          "alias": "TEST444",
+          "src": "assets/1/block444.png"
+        }
+      ]
+    }
+  ]
+}
