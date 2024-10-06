@@ -5,4 +5,7 @@ export interface IScreen {
 
     onEnter(prev: IScreen): void
     onExit(next: IScreen): void
+    pause(): void
+    resume(): void
+    isPaused(): boolean
 }

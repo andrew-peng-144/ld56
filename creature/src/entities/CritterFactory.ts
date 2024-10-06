@@ -19,8 +19,8 @@ export class CritterFactory {
         let critter = new Critter(settings)
 
         Matter.World.addBody(this.engine.world, critter.body);
+
         this.stage.addChild(critter.graphics);
-        
 
         return critter
     }
@@ -39,6 +39,8 @@ export class CritterFactory {
 
 
 export class Critter {
+    entityID: string = ""
+
     body: Matter.Body
     graphics: Graphics
 
@@ -53,8 +55,9 @@ export class Critter {
      */
     timeSpentSinceFiring: number = 0
 
+    totalHealth: number
     health: number
-    
+
     currentTarget: Matter.Vector
 
     /**
@@ -65,56 +68,107 @@ export class Critter {
     readonly projectileLifetime: number
     projectileSpeed: number
 
-    constructor(settings: CritterSettings) {
-        this.movementSpeed = 1.1
-        this.fireDelay = 0.4
-        this.power = 4
-        this.health = 50
-        this.projectileLifetime = 0.8
-        this.projectileSpeed = 4.1
+    team: number
 
+    large: boolean = false
+
+    ability: CritterAbility | null = null
+
+    /**
+     * differentiate when multi selecting
+     */
+    name: string
+
+    constructor(settings: CritterSettings) {
+        this.movementSpeed = settings.movementSpeed || 1.1
+        this.fireDelay = settings.fireDelay || 0.4
+        this.power = settings.power || 4
+        this.totalHealth = settings.totalHealth || 50
+        this.health = this.totalHealth
+        this.projectileLifetime = settings.projectileLifetime || 0.5
+        this.projectileSpeed = settings.projectileSpeed || 4.1
+
+        this.name = settings.name || "default"
+
+        this.currentTarget = { x: 0, y: 0 }
+        this.sightRange = this.projectileSpeed * this.projectileLifetime * 60 //is it always 60?
+        this.team = settings.team
+
+
+        // default body
         const triangleWidth = 20
         const triangleHeight = 15
-        const radius = 8
-        const body = Matter.Bodies.circle(
-            settings.x,
-            settings.y,
-            radius
-        )
-        body.label = 'CRIT'
-        //Matter.World.addBody(this.engine.world, body)
+        if (!settings.body) {
 
-        const triangleShape = new Geometry({
-            attributes: {
-                aPosition: [-100, -50, 100, -50, 0, 100],
-            },
-        });
-        let graphics = new Graphics() //new Graphics(settings.graphicsContext)
+            const radius = 8
+            const body = Matter.Bodies.circle(
+                settings.x,
+                settings.y,
+                radius
+            )
+            this.body = body
+            //body.label = 'CRIT'
+            //Matter.World.addBody(this.engine.world, body)
+        } else {
+            this.body = settings.body
+        }
 
-        graphics.moveTo(triangleWidth / 2, 0)
-        graphics.lineTo(triangleWidth, triangleHeight)
-        graphics.lineTo(0, triangleHeight)
-        graphics.lineTo(triangleWidth / 2, 0)
-        graphics.fill(0xff3300);
-        graphics.stroke({ width: 4, color: 0xffd900 });
-        //this.container.addChild(graphics)
-        //graphics.position.set(settings.x - triangleWidth / 2, settings.y - triangleHeight / 2) //not needed, as handled in update?
-        graphics.pivot.set(triangleWidth / 2, triangleHeight / 2)
+        // default graphics
+        if (!settings.graphics) {
+            let graphics = new Graphics() //new Graphics(settings.graphicsContext)
 
-        this.body = body
-        this.graphics = graphics
-        this.currentTarget = {x: 0, y: 0}
+            graphics.moveTo(triangleWidth / 2, 0)
+            graphics.lineTo(triangleWidth, triangleHeight)
+            graphics.lineTo(0, triangleHeight)
+            graphics.lineTo(triangleWidth / 2, 0)
+            graphics.fill(0xff00ff);
+            graphics.stroke({ width: 4, color: 0x6b6b47 });
+            //this.container.addChild(graphics)
+            //graphics.position.set(settings.x - triangleWidth / 2, settings.y - triangleHeight / 2) //not needed, as handled in update?
+            graphics.pivot.set(triangleWidth / 2, triangleHeight / 2)
 
-        this.sightRange = this.projectileSpeed * this.projectileLifetime * 60 //is it always 60?
+
+            this.graphics = graphics
+        } else {
+            this.graphics = settings.graphics
+        }
+
+
     }
 
 }
 
-interface CritterSettings {
+export interface CritterSettings {
+    movementSpeed?: number
+    fireDelay?: number
+    power?: number
+    totalHealth?: number
+    projectileLifetime?: number
+    projectileSpeed?: number
+
+    body?: Matter.Body
+    graphics?: Graphics
 
     /**
      * CENTER x
      */
     x: number,
     y: number
+
+    team: number
+
+    name?: string
+}
+
+
+interface CritterAbility {
+    name: string
+    cost: number
+
+    archetype: 'self' | 'projectile' | 'health'
+    magnitude: number
+    duration?: number
+    custom?: string
+
+
 }

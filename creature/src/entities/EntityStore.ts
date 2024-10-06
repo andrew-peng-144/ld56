@@ -25,6 +25,10 @@ export class EntityStore<T> {
         }
     }
 
+    has(id: string): boolean {
+        return this.map.has(id)
+    }
+
     add(data: T): string {
         let newId = nanoid()
         if (this.map.has(newId)) {

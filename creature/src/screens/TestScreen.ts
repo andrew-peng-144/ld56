@@ -1,13 +1,15 @@
 import { Viewport } from "pixi-viewport";
 import { IScreen } from "./IScreen";
-import { Sprite, Texture, Assets, Application, Ticker, Text, FederatedPointerEvent } from "pixi.js";
+import { Sprite, Texture, Assets, Application, Ticker, Text, FederatedPointerEvent, Graphics } from "pixi.js";
 import Matter, { Vector } from "matter-js";
 import { EntityStore } from "../entities/EntityStore";
 import { Random } from "random-js";
 import { Settings } from "../Settings";
 import { Critter, CritterFactory } from "../entities/CritterFactory";
 import { Projectile, ProjectileFactory } from "../entities/ProjectileFactory";
-import { round } from "mathjs";
+import { round, square } from "mathjs";
+import { ceratron } from "../entities/entity-building/critters/ceratron";
+import { makeSelectionSquare } from "../entities/entity-building/makeSelectionSquare";
 
 export class TestScreen implements IScreen {
 
@@ -24,26 +26,21 @@ export class TestScreen implements IScreen {
     rng: Random
 
     debugText: Text
+    pausedText: Text
 
     mouseEventX: number = 0
     mouseEventY: number = 0
 
+
     debugBody1: Matter.Body
 
-    markedCritter1: string
+    markedCritter1: string = "error"
+    mouseXMatter: number = 0;
+    mouseYMatter: number = 0;
 
 
-    readonly collisionCategories = {
-        default: 0x0001,
-        critter: 0x0002,
-        projectile: 0x0004,
-        3: 0x0008,
-        4: 0x0010,
-        5: 0x0020,
-        6: 0x0040,
-        7: 0x0080,
-        8: 0x0100
-    }
+    selectionSquares: Set<{ c: Critter, g: Graphics }>
+    selectionCircle: Matter.Body
 
 
     constructor(app: Application, viewport: Viewport, engine: Matter.Engine) {
@@ -84,24 +81,150 @@ export class TestScreen implements IScreen {
         for (let i = 0; i < 10; i++) {
             let newCritter = this.critterFactory.create({
                 x: i * 5,
-                y: this.rng.integer(0, 500)
+                y: this.rng.integer(0, 500),
+                team: Settings.teams.PLAYER
             })
-            newCritter.body.collisionFilter.category = this.collisionCategories.critter
-            newCritter.body.collisionFilter.mask = this.collisionCategories.projectile | this.collisionCategories.critter
-            this.markedCritter1 = this.critters.add(newCritter)
+            newCritter.body.collisionFilter.category = Settings.collisionCategories.CRITTER
+            newCritter.body.collisionFilter.mask = Settings.collisionCategories.PROJECTILE | Settings.collisionCategories.CRITTER
+            let entityID = this.critters.add(newCritter)
+            newCritter.entityID = entityID
+            if (i === 5) {
+                this.markedCritter1 = entityID
+            }
+            newCritter.body.label = entityID
+        }
+        for (let i = 0; i < 10; i++) {
+            let newCritter = this.critterFactory.create(
+                ceratron(
+                    i * 5 + 500,
+                    this.rng.integer(0, 500),
+                    Settings.teams.ENEMY
+                )
+            )
+            newCritter.body.collisionFilter.category = Settings.collisionCategories.CRITTER
+            newCritter.body.collisionFilter.mask = Settings.collisionCategories.PROJECTILE | Settings.collisionCategories.CRITTER
+            let entityID = this.critters.add(newCritter)
+            newCritter.entityID = entityID
+            if (i === 5) {
+                this.markedCritter1 = entityID
+            }
+            newCritter.body.label = entityID
         }
 
         this.projectileFactory = new ProjectileFactory(engine, viewport)
 
 
+        // Selected critters position and graphic
+        this.selectionSquares = new Set()
+        this.selectionCircle = Matter.Bodies.circle(0, 0, Settings.selectionCircleRadius)
+        this.selectionCircle.isSensor = true
+        Matter.World.addBody(this.engine.world, this.selectionCircle);
+
 
         //debug text
         this.debugText = new Text({ x: 10, y: 450, style: { fill: 'black', fontSize: '13px' } })
         app.stage.addChild(this.debugText)
+        this.pausedText = new Text({ x: 450, y: 450, style: { fill: 'black', fontSize: '63px' } })
+        this.pausedText.text = "PAUSED"
+        this.pausedText.visible = false
+        app.stage.addChild(this.pausedText)
+
 
 
         // mouse position
         this.viewport.on('pointermove', (event) => { this.mouseEventX = event.x, this.mouseEventY = event.y })
+        this.viewport.on('pointerdown', (event) => {
+            switch (event.button) {
+                case 0:
+                    console.log("Left button clicked.");
+
+                    // reset selection
+                    this.selectionSquares.forEach(square => {
+                        viewport.removeChild(square.g)
+                        square.g.destroy()
+                    })
+                    this.selectionSquares.clear()
+
+
+                    // query for selected bodies
+                    let resultsPoint = Matter.Query.point(engine.world.bodies, { x: this.mouseXMatter, y: this.mouseYMatter })
+                    let clickedCircle: Matter.Body
+                    if (resultsPoint.length >= 1) {
+                        clickedCircle = resultsPoint[0]
+                    }
+                    if (event.shiftKey) {
+                        // shift click - select all around of same type as clicked
+                        Matter.Body.setPosition(this.selectionCircle, { x: this.mouseXMatter, y: this.mouseYMatter })
+                        let resultsCircle = Matter.Query.region(engine.world.bodies, this.selectionCircle.bounds)
+
+                        resultsCircle.forEach(body => {
+                            if (body.collisionFilter.category === Settings.collisionCategories.CRITTER
+
+
+                            ) {
+                                //console.log("CLICKED CRITTER " + body.label);
+                                if (this.critters.has(body.label) && this.critters.has(clickedCircle.label)) {
+                                    let critter = this.critters.get(body.label)
+
+                                    if (critter.name === this.critters.get(clickedCircle.label).name) {
+                                        let squareGraphics = makeSelectionSquare(critter)
+                                        viewport.addChild(squareGraphics)
+                                        this.selectionSquares.add({ c: critter, g: squareGraphics })
+                                    }
+
+                                }
+                            }
+                        })
+                    } else {
+                        // single click - select point
+                        resultsPoint.forEach(body => {
+                            if (body.collisionFilter.category === Settings.collisionCategories.CRITTER) {
+                                console.log("CLICKED CRITTER " + body.label);
+                                if (this.critters.has(body.label)) {
+                                    let critter = this.critters.get(body.label)
+                                    //this.selectedCritters.add(critter)
+
+                                    let squareGraphics = makeSelectionSquare(critter)
+                                    //squareGraphics.pivot.set(sgWidth / 2, sgHeight / 2)
+                                    viewport.addChild(squareGraphics)
+                                    this.selectionSquares.add({ c: critter, g: squareGraphics })
+                                }
+                            }
+                        })
+                    }
+
+
+                    break;
+                case 1:
+                    console.log("Middle button clicked.");
+                    break;
+                case 2:
+                    console.log("Right button clicked.");
+
+                    this.selectionSquares.forEach(square => {
+                        square.c.currentTarget = { x: this.mouseXMatter, y: this.mouseYMatter }
+                    })
+                    break;
+                default:
+                    console.log(`Unknown button code: ${event.button}`);
+            }
+        })
+        this.viewport.on('pointerup', (event) => {
+            switch (event.button) {
+                case 0:
+                    console.log("Left button up.");
+                    break;
+                case 1:
+                    console.log("Middle button up.");
+                    break;
+                case 2:
+                    console.log("Right button up.");
+                    break;
+                default:
+                    console.log(`Unknown button code up: ${event.button}`);
+            }
+        })
+
 
 
         // register collison event
@@ -109,15 +232,54 @@ export class TestScreen implements IScreen {
             event.pairs.forEach(pair => {
 
                 // damage critter
-                let categoryA = pair.bodyA.collisionFilter.category
-                let categoryB = pair.bodyB.collisionFilter.category
-                if (categoryA === this.collisionCategories.critter && categoryB === this.collisionCategories.projectile
-                    || categoryB === this.collisionCategories.critter && categoryA === this.collisionCategories.projectile
+                let categoryA = pair.bodyA.collisionFilter.category || 0
+                let categoryB = pair.bodyB.collisionFilter.category || 0
+
+                switch (categoryA | categoryB) {
+                    case Settings.collisionCategories.CRITTER | Settings.collisionCategories.PROJECTILE:
+                        //both need to be labelled with the nanoid
+                        let critterEntity: Critter | null = null;
+                        let projEntity: Projectile | null = null;
+                        if (this.critters.has(pair.bodyA.label)) {
+                            critterEntity = this.critters.get(pair.bodyA.label)
+                        } else if (this.projectiles.has(pair.bodyA.label)) {
+                            projEntity = this.projectiles.get(pair.bodyA.label)
+                        }
+                        if (this.critters.has(pair.bodyB.label)) {
+                            critterEntity = this.critters.get(pair.bodyB.label)
+                        } else if (this.projectiles.has(pair.bodyB.label)) {
+                            projEntity = this.projectiles.get(pair.bodyB.label)
+                        }
+
+                        if (critterEntity && projEntity) {
+                            if (critterEntity.team !== projEntity.team) {
+                                //console.log(`${pair.bodyA.label} collided with ${pair.bodyB.label} DIFF TEAMS`);
+
+                            }
+                        }
+
+                        break
+                }
+                if (categoryA === Settings.collisionCategories.CRITTER && categoryB === Settings.collisionCategories.PROJECTILE
+                    || categoryB === Settings.collisionCategories.CRITTER && categoryA === Settings.collisionCategories.PROJECTILE
                 ) {
-                    console.log(`${pair.bodyA.label} collided with ${pair.bodyB.label}`);
+                    //console.log(`${pair.bodyA.label} collided with ${pair.bodyB.label}`);
                 }
             })
         });
+
+
+        // Create mouse constraint
+        // const mouseConstraint = Matter.MouseConstraint.create(
+        //     engine, {}
+        // )
+        // Matter.Events.on(mouseConstraint, "mousedown", () => {
+        //     if (mouseConstraint.body) {
+        //         console.log("CLICKED BODY " + mouseConstraint.body.label)
+        //     }
+        // });
+        // Composite.add(engine.world, mouseConstraint)
+
 
 
     }
@@ -126,6 +288,24 @@ export class TestScreen implements IScreen {
     }
     onExit(next: IScreen): void {
         throw new Error("Method not implemented.");
+    }
+
+    paused: boolean = false
+    pause() {
+        this.app.stop()
+        this.paused = true
+        console.log("PAUSED TESTSCREEN");
+        this.pausedText.visible = true
+        this.app.render()
+    }
+    resume() {
+        this.app.start()
+        this.paused = false
+        console.log("UNPAUSED TESTSCREEN");
+        this.pausedText.visible = false
+    }
+    isPaused() {
+        return this.paused
     }
 
     onUpdate(time: Ticker): void {
@@ -155,8 +335,8 @@ export class TestScreen implements IScreen {
         let mouseXViewport = mouseXVirtual - this.viewport.x //rel. to viewport - no zoom factored in
         let mouseYViewport = mouseYVirtual - this.viewport.y
 
-        let mouseXMatter = mouseXViewport / 2 / this.viewport.scale.x
-        let mouseYMatter = mouseYViewport / 2 / this.viewport.scale.y
+        this.mouseXMatter = mouseXViewport / 2 / this.viewport.scale.x
+        this.mouseYMatter = mouseYViewport / 2 / this.viewport.scale.y
 
 
 
@@ -175,26 +355,36 @@ export class TestScreen implements IScreen {
 
 
             // set target pos to mouse
-            critter.currentTarget = {x: mouseXMatter, y: mouseYMatter}
+            //critter.currentTarget = { x: this.mouseXMatter, y: this.mouseYMatter }
 
             // set rotation to target pos
             let vecToTarget = { x: critter.currentTarget.x - critter.body.position.x, y: critter.currentTarget.y - critter.body.position.y }
             let dir = Matter.Vector.normalise(vecToTarget)
             critter.graphics.rotation = Matter.Vector.angle({ x: 0, y: 0 }, dir) + Math.PI / 2
-            
+
             // move critter to its target pos
             Matter.Body.setVelocity(critter.body, Matter.Vector.mult(dir, critter.movementSpeed))
             //Matter.Body.setVelocity(critter.body, {x:.1, y:.1})
 
+
+            // Selection box
+            this.selectionSquares.forEach(square => {
+                square.g.position.set(square.c.body.bounds.min.x * 2, square.c.body.bounds.min.y * 2)
+
+            })
+
+
+
             // have critters stop in front of their effective range
+            // TODO  only have it stop if the current target is an enemy. if current target is just a position then no
             if (Matter.Vector.magnitude(vecToTarget) <= critter.sightRange) {
                 //debugger;
                 let mag = Matter.Vector.magnitude(vecToTarget)
-                Matter.Body.setVelocity(critter.body, {x:0,y:0})
+                Matter.Body.setVelocity(critter.body, { x: 0, y: 0 })
             }
-            
 
 
+            // only shoot if theres a target in range
             // shoot porjectiles
             critter.timeSpentSinceFiring += time.deltaMS / 1000
             if (critter.timeSpentSinceFiring > critter.fireDelay) {
@@ -206,11 +396,14 @@ export class TestScreen implements IScreen {
                         startingDirection: critter.graphics.angle * Math.PI / 180,
                         critterOwner: critter,
                         lifetime: critter.projectileLifetime,
-                        speed: critter.projectileSpeed
+                        speed: critter.projectileSpeed,
+                        team: critter.team
                     })
-                    newProj.body.collisionFilter.category = this.collisionCategories.projectile
-                    newProj.body.collisionFilter.mask = this.collisionCategories.critter
-                    this.projectiles.add(newProj)
+                    newProj.body.collisionFilter.category = Settings.collisionCategories.PROJECTILE
+                    newProj.body.collisionFilter.mask = Settings.collisionCategories.CRITTER
+                    let entityID = this.projectiles.add(newProj)
+                    newProj.entityID = entityID
+                    newProj.body.label = entityID
                 } else {
                     //alert('projectile limit reached')
                 }
@@ -245,7 +438,7 @@ scale(${this.viewport.scale.x}, ${this.viewport.scale.y})
 mousePosition(${this.mouseEventX}, ${this.mouseEventY})
 mousePosVirtual(${mouseXVirtual}, ${mouseYVirtual})
 mousePosViewport(${mouseXViewport}, ${mouseYViewport})
-mousePosMatter(${mouseXMatter}, ${mouseYMatter})
+mousePosMatter(${this.mouseXMatter}, ${this.mouseYMatter})
 debugBody1(${this.debugBody1.position.x},${this.debugBody1.position.y})
 markedCritter1Body(${this.critters.get(this.markedCritter1).body.position.x},${this.critters.get(this.markedCritter1).body.position.y})
 markedCritter1Sprite(${this.critters.get(this.markedCritter1).graphics.position.x},${this.critters.get(this.markedCritter1).graphics.position.y})

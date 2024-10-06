@@ -44,6 +44,8 @@ export class ProjectileFactory {
 
 
 export class Projectile {
+    entityID: string = ""
+
     body: Matter.Body
     graphics: Graphics
 
@@ -63,10 +65,20 @@ export class Projectile {
 
     element: string | null
 
+    team: number
+
+    health: number
+    totalHealth: number
+
     constructor(settings: ProjectileSettings) {
         this.startingDirection = settings.startingDirection
         this.critterOwner = settings.critterOwner
         this.element = settings.element || null
+
+        this.team = settings.team
+
+        this.health = settings.totalHealth || 1
+        this.totalHealth = settings.totalHealth || 1
 
         this.lifetime = settings.lifetime
         this.speed = settings.speed
@@ -81,7 +93,8 @@ export class Projectile {
         //Matter.Body.setPosition(body, {x:settings.x, y:settings.y})
         body.isSensor = true
         body.frictionAir = 0
-        body.label = `PROJ`
+        body.isStatic = settings.stationary || false
+        //body.label = `PROJ`
 
 
         Matter.Body.setInertia(body, Infinity)
@@ -91,8 +104,8 @@ export class Projectile {
         let graphics = new Graphics()
         graphics.pivot.set(rectWidth / 2, rectHeight / 2)
         graphics.rect(0, 0, rectWidth, rectHeight)
-        graphics.fill(0x650a5a);
-        graphics.stroke({ width: 2, color: 0xff00ff });
+        graphics.fill(0x669999);
+        graphics.stroke({ width: 2, color: 0x1f2e2e });
 
         graphics.rotation = this.startingDirection
 
@@ -115,4 +128,18 @@ interface ProjectileSettings {
     element?: string,
     lifetime: number,
     speed: number
+
+    team: number
+
+    destructible?: boolean
+    /**
+     * only if destructible=true
+     */
+    totalHealth?: number
+
+    customPath?: (x: number,y: number)=>{x: number, y: number}
+
+
+    stationary?: boolean
+
 }
