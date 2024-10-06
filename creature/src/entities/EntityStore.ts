@@ -21,7 +21,7 @@ export class EntityStore<T> {
         if (this.map.has(id) && this.map.get(id)) {
             return this.map.get(id)!
         } else {
-            throw `id ${id} does not exist in ${this.name} game-data`
+            throw `id "${id}" does not exist in ${this.name} game-data`
         }
     }
 
@@ -39,7 +39,7 @@ export class EntityStore<T> {
         if (this.map.has(id)) {
             return this.map.delete(id)
         } else {
-            throw `id ${id} does not exist in ${this.name} game-data`
+            throw `id "${id}" does not exist in ${this.name} game-data`
         }
     }
 
@@ -47,7 +47,7 @@ export class EntityStore<T> {
         if (this.map.has(id)) {
             this.map.set(id, newData)
         } else {
-            throw `id ${id} does not exist in ${this.name} game-data`
+            throw `id "${id}" does not exist in ${this.name} game-data`
         }
     }
 

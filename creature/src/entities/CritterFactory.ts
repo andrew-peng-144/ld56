@@ -53,13 +53,14 @@ export class Critter {
         });
         let graphics = new Graphics() //new Graphics(settings.graphicsContext)
 
-        graphics.moveTo(settings.x + width / 2, settings.y)
-        graphics.lineTo(settings.x + width, settings.y + height)
-        graphics.lineTo(settings.x, settings.y + height)
-        graphics.lineTo(settings.x + width / 2, settings.y)
+        graphics.moveTo(width / 2, 0)
+        graphics.lineTo(width, height)
+        graphics.lineTo(0, height)
+        graphics.lineTo(width / 2, 0)
         graphics.fill(0xff3300);
         graphics.stroke({ width: 4, color: 0xffd900 });
         //this.container.addChild(graphics)
+        graphics.position.set(settings.x, settings.y)
 
         this.body = body
         this.graphics = graphics

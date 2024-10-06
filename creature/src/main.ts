@@ -156,10 +156,7 @@ async function main() {
   const engine = Matter.Engine.create();
   engine.gravity.y = 0
 
-  const asdfBody = Matter.Bodies.rectangle(
-    150, 150, 50, 50
-  )
-  Matter.World.addBody(engine.world, asdfBody)
+
 
   const debug_renderer = Matter.Render.create({
     engine: engine,
