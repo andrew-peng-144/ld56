@@ -71,7 +71,7 @@ export class TestScreen implements IScreen {
         }
 
         //debug text
-        this.debugText = new Text({x: 10, y: 450, style:{fill:'black'}  })
+        this.debugText = new Text({x: 10, y: 450, style:{fill:'black',fontSize:'13px'}  })
         app.stage.addChild(this.debugText)
 
         // mouse position
@@ -93,6 +93,7 @@ export class TestScreen implements IScreen {
         // loop thru each critter and set position of sprite
         this.critters.forEach( (critter: Critter) => {
             critter.graphics.position.set(critter.body.position.x * 2, critter.body.position.y * 2 ) // WHY is there a factor of 2 between matter coords and virtual coords?
+            //critter.graphics.rotation = critter.body.angle
         })
         this.bunny.position.set(this.debugBody1.position.x * 2, this.debugBody1.position.y * 2)
 
@@ -125,8 +126,11 @@ export class TestScreen implements IScreen {
         let mouseXVirtual = (this.mouseEventX - this.app.canvas.getBoundingClientRect().left) / scale
         let mouseYVirtual = (this.mouseEventY - this.app.canvas.getBoundingClientRect().top) / scale
 
-        let mouseXMatter = mouseXVirtual / 2
-        let mouseYMatter = mouseYVirtual / 2
+        let mouseXViewport = mouseXVirtual - this.viewport.x //rel. to viewport - no zoom factored in
+        let mouseYViewport = mouseYVirtual - this.viewport.y
+
+        let mouseXMatter = mouseXViewport / 2 / this.viewport.scale.x
+        let mouseYMatter = mouseYViewport / 2 / this.viewport.scale.y
 
 
         // critters move to mouse
@@ -135,6 +139,7 @@ export class TestScreen implements IScreen {
             let dir = Matter.Vector.normalise({x: mouseXMatter - critter.body.position.x, y: mouseYMatter - critter.body.position.y})
             Matter.Body.setVelocity(critter.body,  Matter.Vector.mult(dir, critter.speed) )
             //Matter.Body.setVelocity(critter.body, {x:.1, y:.1})
+            critter.graphics.rotation = Matter.Vector.angle({x:0, y:0},dir)
         })
 
 
@@ -148,6 +153,8 @@ debugrendererX(${this.engine.render.bounds.min.x}, ${this.engine.render.bounds.m
 scale(${this.viewport.scale.x}, ${this.viewport.scale.y})
 mousePosition(${this.mouseEventX}, ${this.mouseEventY})
 mousePosVirtual(${mouseXVirtual}, ${mouseYVirtual})
+mousePosViewport(${mouseXViewport}, ${mouseYViewport})
+mousePosMatter(${mouseXMatter}, ${mouseYMatter})
 debugBody1(${this.debugBody1.position.x},${this.debugBody1.position.y})
 markedCritter1Body(${this.critters.get(this.markedCritter1).body.position.x},${this.critters.get(this.markedCritter1).body.position.y})
 markedCritter1Sprite(${this.critters.get(this.markedCritter1).graphics.position.x},${this.critters.get(this.markedCritter1).graphics.position.y})

@@ -144,11 +144,12 @@ async function main() {
   matter_debug_canvas.id = "sdfg";
   matter_debug_canvas.style.zIndex = '8';
   matter_debug_canvas.style.position = "absolute";
-  matter_debug_canvas.style.border = "1px solid";
   matter_debug_canvas.style.pointerEvents = "none"; //click thru it.
   matter_debug_canvas.style.top = "0"
   matter_debug_canvas.style.left = "0"
-  document.body.appendChild(matter_debug_canvas);
+  if (Settings.debug_render) {
+    document.body.appendChild(matter_debug_canvas);
+  }
   const matter_canvas_ctx = matter_debug_canvas.getContext('2d')!;
   matter_canvas_ctx.globalAlpha = 0;
 

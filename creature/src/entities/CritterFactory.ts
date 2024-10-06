@@ -36,13 +36,13 @@ export class Critter {
 
     constructor(settings: CritterSettings) {
         this.speed = 1.1
-        const width = 20
-        const height = 15
-        const body = Matter.Bodies.rectangle(
+        const triangleWidth = 20
+        const triangleHeight = 15
+        const radius = 8
+        const body = Matter.Bodies.circle(
             settings.x,
             settings.y,
-            width,
-            height
+            radius
         )
         //Matter.World.addBody(this.engine.world, body)
 
@@ -52,15 +52,16 @@ export class Critter {
             },
         });
         let graphics = new Graphics() //new Graphics(settings.graphicsContext)
-
-        graphics.moveTo(width / 2, 0)
-        graphics.lineTo(width, height)
-        graphics.lineTo(0, height)
-        graphics.lineTo(width / 2, 0)
+        
+        graphics.moveTo(triangleWidth / 2, 0)
+        graphics.lineTo(triangleWidth, triangleHeight)
+        graphics.lineTo(0, triangleHeight)
+        graphics.lineTo(triangleWidth / 2, 0)
         graphics.fill(0xff3300);
         graphics.stroke({ width: 4, color: 0xffd900 });
         //this.container.addChild(graphics)
-        graphics.position.set(settings.x, settings.y)
+        //graphics.position.set(settings.x - triangleWidth / 2, settings.y - triangleHeight / 2) //not needed, as handled in update?
+        graphics.pivot.set(triangleWidth / 2, triangleHeight / 2)
 
         this.body = body
         this.graphics = graphics
@@ -69,6 +70,9 @@ export class Critter {
 }
 
 interface CritterSettings {
+    /**
+     * CENTER x
+     */
     x: number,
     y: number
 }
