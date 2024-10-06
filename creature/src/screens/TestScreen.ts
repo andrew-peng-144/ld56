@@ -44,7 +44,7 @@ export class TestScreen implements IScreen {
     selectionSquares: Set<{ c: Critter, g: Graphics }>
     selectionCircle: Matter.Body
 
-    playerClickedOnAttackable: Matter.Body | null = null
+    //playerClickedOnAttackable: Matter.Body | null = null
 
 
     constructor(app: Application, viewport: Viewport, engine: Matter.Engine) {
@@ -158,7 +158,7 @@ export class TestScreen implements IScreen {
                     let clickedCircle: Matter.Body
                     if (resultsPoint.length >= 1) {
                         clickedCircle = resultsPoint[0]
-                        this.playerClickedOnAttackable = clickedCircle
+                        //this.playerClickedOnAttackable = clickedCircle
                     }
                     if (event.shiftKey) {
                         // shift click - select all around of same type as clicked
@@ -213,10 +213,10 @@ export class TestScreen implements IScreen {
                         square.c.currentTarget = { x: this.mouseXMatter, y: this.mouseYMatter }
                         square.c.currentTargetAttack = { x: this.mouseXMatter, y: this.mouseYMatter }
                         square.c.shouldMove = true
-                        if (this.playerClickedOnAttackable !== null) {
-                            square.c.shouldAttack = true
-                            this.playerClickedOnAttackable = null
-                        }
+                        // if (this.playerClickedOnAttackable !== null) {
+                        //     square.c.shouldAttack = true
+                        //     this.playerClickedOnAttackable = null
+                        // }
                     })
                     break;
                 default:

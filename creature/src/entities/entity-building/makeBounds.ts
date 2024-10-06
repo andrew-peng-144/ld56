@@ -7,7 +7,7 @@ import { Settings } from "../../Settings";
 const WORLD_WIDTH = 2000 // Matter units
 const WORLD_HEIGHT = 2000
 const WALL_WIDTH = 200
-const BOUND_COLOR = 0x54c8d2//0x8b8b91
+const BOUND_COLOR = 0x349098//0x8b8b91
 
 export function makeBounds(app: Application, engine: Matter.Engine, viewport: Viewport) {
     
