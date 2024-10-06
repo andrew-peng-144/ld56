@@ -1,6 +1,6 @@
 import { Viewport } from "pixi-viewport";
 import { IScreen } from "./IScreen";
-import { Sprite, Texture, Assets, Application, Ticker, Text, FederatedPointerEvent, Graphics } from "pixi.js";
+import { Sprite, Texture, Assets, Application, Ticker, Text, FederatedPointerEvent, Graphics, ObservablePoint } from "pixi.js";
 import Matter, { Vector } from "matter-js";
 import { EntityStore } from "../entities/EntityStore";
 import { Random } from "random-js";
@@ -10,6 +10,8 @@ import { Projectile, ProjectileFactory } from "../entities/ProjectileFactory";
 import { round, square } from "mathjs";
 import { ceratron } from "../entities/entity-building/critters/ceratron";
 import { makeSelectionSquare } from "../entities/entity-building/makeSelectionSquare";
+import { makeBounds } from "../entities/entity-building/makeBounds";
+import { shootProjectile } from "../entities/entity-building/shootProjectile";
 
 export class TestScreen implements IScreen {
 
@@ -42,15 +44,21 @@ export class TestScreen implements IScreen {
     selectionSquares: Set<{ c: Critter, g: Graphics }>
     selectionCircle: Matter.Body
 
+    playerClickedOnAttackable: Matter.Body | null = null
+
 
     constructor(app: Application, viewport: Viewport, engine: Matter.Engine) {
+
+
+        // add bounds
+        makeBounds(app, engine, viewport)
 
 
         // add a red box
         const sprite = viewport.addChild(new Sprite(Texture.WHITE))
         sprite.tint = 0xff0000
-        sprite.width = sprite.height = 100
-        sprite.position.set(100, 100)
+        sprite.width = sprite.height = 50
+        sprite.position.set(0, 0)
 
         // draw test sprite
         const texture = Assets.get('TEST444')
@@ -85,7 +93,7 @@ export class TestScreen implements IScreen {
                 team: Settings.teams.PLAYER
             })
             newCritter.body.collisionFilter.category = Settings.collisionCategories.CRITTER
-            newCritter.body.collisionFilter.mask = Settings.collisionCategories.PROJECTILE | Settings.collisionCategories.CRITTER
+            newCritter.body.collisionFilter.mask = Settings.collisionCategories.PROJECTILE | Settings.collisionCategories.CRITTER | Settings.collisionCategories.WALL
             let entityID = this.critters.add(newCritter)
             newCritter.entityID = entityID
             if (i === 5) {
@@ -102,12 +110,9 @@ export class TestScreen implements IScreen {
                 )
             )
             newCritter.body.collisionFilter.category = Settings.collisionCategories.CRITTER
-            newCritter.body.collisionFilter.mask = Settings.collisionCategories.PROJECTILE | Settings.collisionCategories.CRITTER
+            newCritter.body.collisionFilter.mask = Settings.collisionCategories.PROJECTILE | Settings.collisionCategories.CRITTER | Settings.collisionCategories.WALL
             let entityID = this.critters.add(newCritter)
             newCritter.entityID = entityID
-            if (i === 5) {
-                this.markedCritter1 = entityID
-            }
             newCritter.body.label = entityID
         }
 
@@ -122,9 +127,11 @@ export class TestScreen implements IScreen {
 
 
         //debug text
-        this.debugText = new Text({ x: 10, y: 450, style: { fill: 'black', fontSize: '13px' } })
+        this.debugText = new Text({ x: 10, y: 450, style: { fill: 'white', fontSize: '13px' } })
+        //this.debugText.width /= 2
+        //this.debugText.height /= 2
         app.stage.addChild(this.debugText)
-        this.pausedText = new Text({ x: 450, y: 450, style: { fill: 'black', fontSize: '63px' } })
+        this.pausedText = new Text({ x: 450, y: 450, style: { fill: 'white', fontSize: '63px' } })
         this.pausedText.text = "PAUSED"
         this.pausedText.visible = false
         app.stage.addChild(this.pausedText)
@@ -151,6 +158,7 @@ export class TestScreen implements IScreen {
                     let clickedCircle: Matter.Body
                     if (resultsPoint.length >= 1) {
                         clickedCircle = resultsPoint[0]
+                        this.playerClickedOnAttackable = clickedCircle
                     }
                     if (event.shiftKey) {
                         // shift click - select all around of same type as clicked
@@ -200,9 +208,15 @@ export class TestScreen implements IScreen {
                     break;
                 case 2:
                     console.log("Right button clicked.");
-
+                    
                     this.selectionSquares.forEach(square => {
                         square.c.currentTarget = { x: this.mouseXMatter, y: this.mouseYMatter }
+                        square.c.currentTargetAttack = { x: this.mouseXMatter, y: this.mouseYMatter }
+                        square.c.shouldMove = true
+                        if (this.playerClickedOnAttackable !== null) {
+                            square.c.shouldAttack = true
+                            this.playerClickedOnAttackable = null
+                        }
                     })
                     break;
                 default:
@@ -357,14 +371,49 @@ export class TestScreen implements IScreen {
             // set target pos to mouse
             //critter.currentTarget = { x: this.mouseXMatter, y: this.mouseYMatter }
 
-            // set rotation to target pos
-            let vecToTarget = { x: critter.currentTarget.x - critter.body.position.x, y: critter.currentTarget.y - critter.body.position.y }
-            let dir = Matter.Vector.normalise(vecToTarget)
-            critter.graphics.rotation = Matter.Vector.angle({ x: 0, y: 0 }, dir) + Math.PI / 2
+            let vecToTargetAttack = { x: critter.currentTargetAttack.x - critter.body.position.x, y: critter.currentTargetAttack.y - critter.body.position.y }
+            let dirAttack = Matter.Vector.normalise(vecToTargetAttack)
+            let vecToTargetMove = { x: critter.currentTarget.x - critter.body.position.x, y: critter.currentTarget.y - critter.body.position.y }
+            let dirMove = Matter.Vector.normalise(vecToTargetMove)
+            if (critter.shouldAttack) {
 
-            // move critter to its target pos
-            Matter.Body.setVelocity(critter.body, Matter.Vector.mult(dir, critter.movementSpeed))
-            //Matter.Body.setVelocity(critter.body, {x:.1, y:.1})
+                // unused ^
+
+                shootProjectile(critter, time, this.projectiles, this.projectileFactory)
+            }
+
+            if (critter.shouldMove) {
+                // move critter to its target pos
+
+                Matter.Body.setVelocity(critter.body, Matter.Vector.mult(dirMove, critter.movementSpeed))
+                //Matter.Body.setVelocity(critter.body, {x:.1, y:.1})
+
+                // rotate sprite to target pos to move
+                critter.graphics.rotation = Matter.Vector.angle({ x: 0, y: 0 }, dirMove) + Math.PI / 2
+
+                // have critters stop in front of their effective range
+                // TODO  only have it stop if the current target is an enemy. if current target is just a position then no
+                if (Matter.Vector.magnitude(vecToTargetMove) <= 1) {
+                    //threashold to prevent micro-movement
+                    critter.shouldMove = false
+                    critter.shouldAttack = false
+
+                }
+                else if (Matter.Vector.magnitude(vecToTargetAttack) <= critter.sightRange) {
+                    //in sight range
+
+                    //let mag = Matter.Vector.magnitude(vecToTarget)
+                    //Matter.Body.setVelocity(critter.body, { x: 0, y: 0 })
+                    critter.shouldMove = false
+                    critter.shouldAttack = true
+                    
+                } else {
+                    critter.shouldMove = true
+                    critter.shouldAttack = false
+                }
+            } else {
+                Matter.Body.setVelocity(critter.body, {x: 0, y: 0})
+            }
 
 
             // Selection box
@@ -374,41 +423,6 @@ export class TestScreen implements IScreen {
             })
 
 
-
-            // have critters stop in front of their effective range
-            // TODO  only have it stop if the current target is an enemy. if current target is just a position then no
-            if (Matter.Vector.magnitude(vecToTarget) <= critter.sightRange) {
-                //debugger;
-                let mag = Matter.Vector.magnitude(vecToTarget)
-                Matter.Body.setVelocity(critter.body, { x: 0, y: 0 })
-            }
-
-
-            // only shoot if theres a target in range
-            // shoot porjectiles
-            critter.timeSpentSinceFiring += time.deltaMS / 1000
-            if (critter.timeSpentSinceFiring > critter.fireDelay) {
-                critter.timeSpentSinceFiring -= critter.fireDelay
-                if (this.projectiles.size() < 450) {
-                    let newProj = this.projectileFactory.create({
-                        x: critter.body.position.x,
-                        y: critter.body.position.y,
-                        startingDirection: critter.graphics.angle * Math.PI / 180,
-                        critterOwner: critter,
-                        lifetime: critter.projectileLifetime,
-                        speed: critter.projectileSpeed,
-                        team: critter.team
-                    })
-                    newProj.body.collisionFilter.category = Settings.collisionCategories.PROJECTILE
-                    newProj.body.collisionFilter.mask = Settings.collisionCategories.CRITTER
-                    let entityID = this.projectiles.add(newProj)
-                    newProj.entityID = entityID
-                    newProj.body.label = entityID
-                } else {
-                    //alert('projectile limit reached')
-                }
-
-            }
         })
 
 

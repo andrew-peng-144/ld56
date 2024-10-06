@@ -1,4 +1,4 @@
-import { Application, Assets } from 'pixi.js';
+import { Application, Assets, TexturePool } from 'pixi.js';
 import { Game } from './GameRoot'
 import MainLoop from "mainloop.js";
 import Matter, { Composite } from "matter-js";
@@ -97,7 +97,7 @@ async function main() {
 
 
     await app.init({
-        background: '#d6f5f5',
+        background: 0x120e3b,
         //resizeTo: window, // incompatible with letterbox scale
         resolution: window.devicePixelRatio || 1,
         width: Settings.V_WIDTH,
@@ -105,6 +105,7 @@ async function main() {
         antialias: true,
         autoDensity: true
     });
+    //TexturePool.textureOptions.scaleMode = 'nearest'
     //TextureStyle.defaultOptions.scaleMode = 'nearest';
 
     // Then adding the application's canvas to the DOM body.

@@ -21,8 +21,8 @@ export class ProjectileFactory {
         let proj = new Projectile(settings)
         Matter.World.addBody(this.engine.world, proj.body);
         Matter.Body.setVelocity(proj.body, {
-            x: proj.speed * Math.cos(proj.startingDirection - Math.PI/2),
-            y: proj.speed * Math.sin(proj.startingDirection - Math.PI/2)
+            x: proj.speed * Math.cos(proj.startingDirection - Math.PI / 2),
+            y: proj.speed * Math.sin(proj.startingDirection - Math.PI / 2)
         })
         this.stage.addChild(proj.graphics);
 
@@ -84,40 +84,48 @@ export class Projectile {
         this.speed = settings.speed
         const rectWidth = 7
         const rectHeight = 23
-        const body = Matter.Bodies.rectangle(
-            settings.x,// - rectWidth / 2,
-            settings.y,// - rectHeight / 2,
-            rectWidth / 2,
-            rectHeight / 2
-        )
-        //Matter.Body.setPosition(body, {x:settings.x, y:settings.y})
-        body.isSensor = true
-        body.frictionAir = 0
-        body.isStatic = settings.stationary || false
-        //body.label = `PROJ`
+
+        if (!settings.body) {
+            const body = Matter.Bodies.rectangle(
+                settings.x,// - rectWidth / 2,
+                settings.y,// - rectHeight / 2,
+                rectWidth / 2,
+                rectHeight / 2
+            )
+            //Matter.Body.setPosition(body, {x:settings.x, y:settings.y})
+            body.isSensor = true
+            body.frictionAir = 0
+            body.isStatic = settings.stationary || false
+            //body.label = `PROJ`
 
 
-        Matter.Body.setInertia(body, Infinity)
-        Matter.Body.setAngle(body, this.startingDirection)
+            Matter.Body.setInertia(body, Infinity)
+            Matter.Body.setAngle(body, this.startingDirection)
+            this.body = body
 
+        } else {
+            this.body = settings.body
+        }
 
-        let graphics = new Graphics()
-        graphics.pivot.set(rectWidth / 2, rectHeight / 2)
-        graphics.rect(0, 0, rectWidth, rectHeight)
-        graphics.fill(0x669999);
-        graphics.stroke({ width: 2, color: 0x1f2e2e });
+        if (!settings.graphics) {
+            let graphics = new Graphics()
+            graphics.pivot.set(rectWidth / 2, rectHeight / 2)
+            graphics.rect(0, 0, rectWidth, rectHeight)
+            graphics.fill(0x669999);
+            graphics.stroke({ width: 2, color: 0x1f2e2e });
 
-        graphics.rotation = this.startingDirection
+            graphics.rotation = this.startingDirection
+            this.graphics = graphics
+        } else {
+            this.graphics = settings.graphics
+        }
 
-
-        this.body = body
-        this.graphics = graphics
     }
 
 }
 
 interface ProjectileSettings {
-    
+
     /**
      * CENTER x
      */
@@ -131,15 +139,25 @@ interface ProjectileSettings {
 
     team: number
 
+
+    body?: Matter.Body
+    graphics?: Graphics
+
+
     destructible?: boolean
     /**
      * only if destructible=true
      */
     totalHealth?: number
 
-    customPath?: (x: number,y: number)=>{x: number, y: number}
+    customPath?: (x: number, y: number) => { x: number, y: number }
 
 
     stationary?: boolean
+
+    /**
+     * stationary part of map that critters attack for resources
+     */
+    isMiningNode?: boolean
 
 }

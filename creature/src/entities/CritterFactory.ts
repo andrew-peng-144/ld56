@@ -59,6 +59,9 @@ export class Critter {
     health: number
 
     currentTarget: Matter.Vector
+    currentTargetAttack: Matter.Vector
+    shouldAttack: boolean
+    shouldMove: boolean
 
     /**
      * matter units
@@ -91,6 +94,9 @@ export class Critter {
         this.name = settings.name || "default"
 
         this.currentTarget = { x: 0, y: 0 }
+        this.currentTargetAttack = {x: 0, y: 0}
+        this.shouldAttack = false
+        this.shouldMove = false
         this.sightRange = this.projectileSpeed * this.projectileLifetime * 60 //is it always 60?
         this.team = settings.team
 

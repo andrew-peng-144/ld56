@@ -10,7 +10,7 @@ export class Settings {
         DEFAULT: 0x0001,
         CRITTER: 0x0002,
         PROJECTILE: 0x0004,
-        3: 0x0008,
+        WALL: 0x0008,
         4: 0x0010,
         5: 0x0020,
         6: 0x0040,
