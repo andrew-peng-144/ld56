@@ -9,9 +9,12 @@ import { nanoid } from "nanoid";
 export class EntityStore<T> {
     private map: Map<string, T>
     private name: string
+
+
     constructor(name: string) {
         this.map = new Map()
         this.name = name
+
     }
 
     get(id: string): T {
@@ -46,6 +49,15 @@ export class EntityStore<T> {
         } else {
             throw `id ${id} does not exist in ${this.name} game-data`
         }
+    }
+
+    /**
+     * same as Map.forEach()
+     * 
+     * Executes a provided function once per each key/value pair in the Map, in insertion order.
+     */
+    forEach(callbackfn: (value: T, key: string, map: Map<string, T>) => void, thisArg?: any): void {
+        this.map.forEach(callbackfn)
     }
 
     /**
