@@ -99,7 +99,8 @@ async function main() {
     //resizeTo: window, // incompatible with letterbox scale
     resolution: window.devicePixelRatio || 1,
     width: Settings.V_WIDTH,
-    height: Settings.V_HEIGHT
+    height: Settings.V_HEIGHT,
+    antialias: true
   });
   //TextureStyle.defaultOptions.scaleMode = 'nearest';
 

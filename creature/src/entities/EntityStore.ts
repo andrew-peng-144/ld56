@@ -51,6 +51,10 @@ export class EntityStore<T> {
         }
     }
 
+    size() {
+        return this.map.size
+    }
+
     /**
      * same as Map.forEach()
      * 
