@@ -1,16 +1,15 @@
 import { Random } from "random-js";
-import { WaveHelper } from "../screens/helper/WaveHelper";
-import { Critter } from "./CritterFactory";
-import { EntityStore } from "./EntityStore";
-import { Projectile, ProjectileFactory } from "./ProjectileFactory";
-import { makeVirus1 } from "./entity-building/makeVirus";
-import { MyMath } from "../utils/MyMath";
-import { Settings } from "../Settings";
+import { Critter, CritterFactory } from "../CritterFactory";
+import { EntityStore } from "../EntityStore";
+import { Projectile, ProjectileFactory } from "../ProjectileFactory";
+import { makeVirus1 } from "./makeVirus";
+import { MyMath } from "../../utils/MyMath";
+import { Settings } from "../../Settings";
 import { Viewport } from "pixi-viewport";
 
 
 
-export function makeLevelLayout(engine: Matter.Engine, viewport: Viewport,  critters: EntityStore<Critter>, projectiles: EntityStore<Projectile>, projectileFactory: ProjectileFactory, rng: Random) {
+export function makeLevelLayout(engine: Matter.Engine, viewport: Viewport,  critters: EntityStore<Critter>, critterFactory: CritterFactory, projectiles: EntityStore<Projectile>, projectileFactory: ProjectileFactory, rng: Random) {
 
 
     // hexagon
@@ -24,6 +23,8 @@ export function makeLevelLayout(engine: Matter.Engine, viewport: Viewport,  crit
             ,engine, viewport, critters, projectiles, projectileFactory, rng
         )
     }
+
+    spawnStartingCritters(critterFactory, rng, critters)
 }
 
 function spawnSupers(r: number, t: number, engine: Matter.Engine, viewport: Viewport, critters: EntityStore<Critter>, projectiles: EntityStore<Projectile>, projectileFactory: ProjectileFactory, rng: Random) {
@@ -54,7 +55,23 @@ function spawnSupers(r: number, t: number, engine: Matter.Engine, viewport: View
     newVirus.body.label = entityID
 }
 
-function spawnStartingCritters() {
+function spawnStartingCritters(critterFactory: CritterFactory, rng: Random, critters: EntityStore<Critter>) {
 
-    //start w/ one red
+    //start w/ one STRONG guy
+    let newCritter = critterFactory.create({
+        x: 0,
+        y: 0,
+        team: Settings.teams.PLAYER,
+        movementSpeed: 5.5,
+        projectileLifetime: 0.5,
+        projectileSpeed: 25,
+        fireDelay: 0.08,
+        color: 0xe6b800,
+        scale: 2.2,
+        name: Settings.CritterNames.YELLOW
+    })
+
+    let entityID = critters.add(newCritter)
+    newCritter.entityID = entityID
+    newCritter.body.label = entityID
 }

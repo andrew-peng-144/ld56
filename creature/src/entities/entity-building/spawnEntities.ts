@@ -8,31 +8,50 @@ import { Settings } from "../../Settings";
 
 
 const virus_spawn_count = 3
-export function spawnCritters(count: number, engine: Matter.Engine, viewport: Viewport,  critters: EntityStore<Critter>, critterFactory: CritterFactory, projectiles: EntityStore<Projectile>, projectileFactory: ProjectileFactory,  rng: Random) {
+export function spawnCritters(count: number, spawnRadiusMultMin: number, spawnRadiusMultMax: number, name: string, engine: Matter.Engine, viewport: Viewport, critters: EntityStore<Critter>, critterFactory: CritterFactory, projectiles: EntityStore<Projectile>, projectileFactory: ProjectileFactory, rng: Random) {
     let scaleToBorder = 0.8
-    let spawnRadius = Settings.WORLD_RADIUS  * scaleToBorder
+    let spawnRadius = Settings.WORLD_RADIUS * scaleToBorder
 
     let intervalMs = 0,
-    projectileSpeed = 0,
-    projectileLifetime = 4,
-    hp = 1,
-    scale = 1,
-    color = 0,
-    spawnRadiusMultMin = 0,
-    spawnRadiusMultMax = 1
+        projectileSpeed = 0,
+        projectileLifetime = 4,
+        movementSpeed = 4,
+        hp = 1,
+        scale = 1,
+        color = 0,
+        fireDelay = 1.0
+
+    switch (name) {
+        case Settings.CritterNames.GREEN:
+            color = 0x59b300
+            scale = 1.3
+            movementSpeed = 4.4
+            projectileSpeed = 8.8
+            projectileLifetime = 0.5
+            fireDelay = 2.2
+            break
+        default:
+            projectileLifetime = 1.9
+            projectileSpeed = 14
+            fireDelay = 0.9
+            break
+    }
     for (let i = 0; i < count; i++) {
         let r = rng.real(spawnRadius * spawnRadiusMultMin, spawnRadius * spawnRadiusMultMax)
         let angle = rng.real(0, Math.PI * 2)
-    
+
         let newCritter = critterFactory.create({
             x: r * Math.cos(angle),
             y: r * Math.sin(angle),
             team: Settings.teams.PLAYER,
-            projectileLifetime: 1.9,
-            projectileSpeed: 14,
-            fireDelay: 0.9
+            projectileLifetime: projectileLifetime,
+            projectileSpeed: projectileSpeed,
+            fireDelay: fireDelay,
+            movementSpeed: movementSpeed,
+            scale: scale,
+            name: name
         })
-    
+
         let entityID = critters.add(newCritter)
         newCritter.entityID = entityID
         newCritter.body.label = entityID
@@ -41,36 +60,32 @@ export function spawnCritters(count: number, engine: Matter.Engine, viewport: Vi
 
 }
 
-export function spawnViruses(strength: number, engine: Matter.Engine, viewport: Viewport,  critters: EntityStore<Critter>, projectiles: EntityStore<Projectile>, projectileFactory: ProjectileFactory, rng: Random) {
+export function spawnViruses(strength: number,  spawnRadiusMultMin: number, spawnRadiusMultMax: number, engine: Matter.Engine, viewport: Viewport, critters: EntityStore<Critter>, projectiles: EntityStore<Projectile>, projectileFactory: ProjectileFactory, rng: Random) {
     // TODO have them spawn only near existing virus
     let scaleToBorder = 0.8
-    let spawnRadius = Settings.WORLD_RADIUS  * scaleToBorder
+    let spawnRadius = Settings.WORLD_RADIUS * scaleToBorder
 
     let intervalMs = 0,
-    projectileSpeed = 0,
-    projectileLifetime = 4,
-    hp = 1,
-    scale = 1,
-    color = 0,
-    spawnRadiusMultMin = 0,
-    spawnRadiusMultMax = 1
+        projectileSpeed = 0,
+        projectileLifetime = 4,
+        hp = 1,
+        scale = 1,
+        color = 0
 
-    switch(strength) {
+    switch (strength) {
         case 1:
             intervalMs = 10000
             projectileSpeed = 15.1
-            hp = rng.integer(20,60)
+            hp = rng.integer(20, 60)
             scale = 2
             color = 0x9999ff
-            spawnRadiusMultMin = 0.25
-            spawnRadiusMultMax = 0.4
             break;
         default:
             intervalMs = 15000
             projectileSpeed = 8.1
             hp = 11
             scale = 3.3
-            color= 0xff6666
+            color = 0xff6666
             break;
     }
 
@@ -98,7 +113,7 @@ export function spawnViruses(strength: number, engine: Matter.Engine, viewport: 
                 rng
             )
         )
-    
+
         let entityID = projectiles.add(newVirus)
         newVirus.entityID = entityID
         newVirus.body.label = entityID

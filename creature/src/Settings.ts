@@ -31,32 +31,38 @@ export class Settings {
         8: 0x0100
     }
 
-    static readonly elements = {
-        physical: 0,
-        fire: 1,
-        water: 2,
-        plant: 3,
-        ice: 4,
-        electric: 5,
-        wind: 6,
-        metal: 7,
-        plague: 8,
-        healing: 9,
-        rock: 10,
-        shell: 11,
-        blunt: 12,
-        sound: 13,
-        glass: 14,
-        brainwave: 15
-
+    static readonly CritterNames = {
+        RED: "Rojoruga",
+        GREEN: "asdf",
+        YELLOW: "KING"
     }
-    static readonly elemental_effectiveness = [
-        {
-            el: Settings.elements.physical,
-            beats: [Settings.elements.glass],
-            bad: [Settings.elements.rock, Settings.elements.metal]
-        }
-    ]
+
+    // static readonly elements = {
+    //     physical: 0,
+    //     fire: 1,
+    //     water: 2,
+    //     plant: 3,
+    //     ice: 4,
+    //     electric: 5,
+    //     wind: 6,
+    //     metal: 7,
+    //     plague: 8,
+    //     healing: 9,
+    //     rock: 10,
+    //     shell: 11,
+    //     blunt: 12,
+    //     sound: 13,
+    //     glass: 14,
+    //     brainwave: 15
+
+    // }
+    // static readonly elemental_effectiveness = [
+    //     {
+    //         el: Settings.elements.physical,
+    //         beats: [Settings.elements.glass],
+    //         bad: [Settings.elements.rock, Settings.elements.metal]
+    //     }
+    // ]
 
 
     static readonly teams = {
@@ -67,77 +73,77 @@ export class Settings {
 
     static readonly selectionCircleRadius = 500
 
-    static readonly critterColors = {
-        red: 0,
-        blue: 0,
-        green: 0,
-        yellow: 0,
-        purple: 0
-    }
-    static readonly virusColors = {
-        red: 0,
-        blue: 0,
-        green: 0,
-        yellow: 0,
-        purple: 0
-    }
+    // static readonly critterColors = {
+    //     red: 0,
+    //     blue: 0,
+    //     green: 0,
+    //     yellow: 0,
+    //     purple: 0
+    // }
+    // static readonly virusColors = {
+    //     red: 0,
+    //     blue: 0,
+    //     green: 0,
+    //     yellow: 0,
+    //     purple: 0
+    // }
 
-    static readonly viruses = {
-        easy: 1,
-        norma: 2,
-        blue: 3,
-        cyano: 4,
-        hard: 5,
-    }
+    // static readonly viruses = {
+    //     easy: 1,
+    //     norma: 2,
+    //     blue: 3,
+    //     cyano: 4,
+    //     hard: 5,
+    // }
 
 
-    static waves: Wave[] = [
-        {
-            num: 0,
-            viruses: []
-        },
-        {
-            num: 1,
-            viruses: [
-                {
-                    type: Settings.viruses.easy,
-                    count: 3,
-                    predelayMs: 2000
-                },
-                {
-                    type: Settings.viruses.blue,
-                    count: 1,
-                    predelayMs: 2000
-                },
-                {
-                    type: Settings.viruses.easy,
-                    count: 5,
-                    predelayMs: 3000
-                }
-            ]
+    // static waves: Wave[] = [
+    //     {
+    //         num: 0,
+    //         viruses: []
+    //     },
+    //     {
+    //         num: 1,
+    //         viruses: [
+    //             {
+    //                 type: Settings.viruses.easy,
+    //                 count: 3,
+    //                 predelayMs: 2000
+    //             },
+    //             {
+    //                 type: Settings.viruses.blue,
+    //                 count: 1,
+    //                 predelayMs: 2000
+    //             },
+    //             {
+    //                 type: Settings.viruses.easy,
+    //                 count: 5,
+    //                 predelayMs: 3000
+    //             }
+    //         ]
 
-        },
-        {
-            num: 2,
-            viruses: [
-                {
-                    type: Settings.viruses.easy,
-                    count: 5,
-                    predelayMs: 2000
-                },
-                {
-                    type: Settings.viruses.blue,
-                    count: 2,
-                    predelayMs: 2000
-                },
-                {
-                    type: Settings.viruses.easy,
-                    count: 8,
-                    predelayMs: 3000
-                }
-            ]
+    //     },
+    //     {
+    //         num: 2,
+    //         viruses: [
+    //             {
+    //                 type: Settings.viruses.easy,
+    //                 count: 5,
+    //                 predelayMs: 2000
+    //             },
+    //             {
+    //                 type: Settings.viruses.blue,
+    //                 count: 2,
+    //                 predelayMs: 2000
+    //             },
+    //             {
+    //                 type: Settings.viruses.easy,
+    //                 count: 8,
+    //                 predelayMs: 3000
+    //             }
+    //         ]
 
-        }
-    ]
+    //     }
+    // ]
 
 }

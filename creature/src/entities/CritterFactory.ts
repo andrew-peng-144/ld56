@@ -172,11 +172,11 @@ export class Critter {
 
 export interface CritterSettings {
     movementSpeed?: number
-    fireDelay?: number
     power?: number
     totalHealth?: number
-    projectileLifetime?: number
-    projectileSpeed?: number
+    fireDelay: number
+    projectileLifetime: number
+    projectileSpeed: number
 
     body?: Matter.Body
     graphics?: Graphics

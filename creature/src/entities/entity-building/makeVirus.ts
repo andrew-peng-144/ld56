@@ -2,22 +2,20 @@
 // has a cue of a circle that expands,
 // spawns friendly critter when defeated (of same/random type?)
 
-import Matter, { Body } from "matter-js"
+import Matter from "matter-js"
 import { Graphics, Ticker } from "pixi.js"
 import { EntityStore } from "../EntityStore"
 import { Projectile, ProjectileFactory, ProjectileSettings } from "../ProjectileFactory"
 import { Settings } from "../../Settings"
 import { Critter } from "../CritterFactory"
 import { Random } from "random-js"
-import { bohrMagnetonDependencies } from "mathjs"
-import { WaveHelper } from "../../screens/helper/WaveHelper"
 import { Text } from "pixi.js"
 import { Viewport } from "pixi-viewport"
 
 
-function makeVirusHelper() {
+// function makeVirusHelper() {
 
-}
+// }
 
 interface VirusSettings {
     centerX: number,
@@ -91,12 +89,12 @@ export function makeVirus1(settings: VirusSettings,
     viewport.addChild(targetingBeam)
 
 
-    let critterToSpawn = null
+   // let critterToSpawn = null
 
 
     let g = new Graphics() //animated in customUpdate below
     //g.visible = false
-    let g2 = new Graphics() //lag?
+    //let g2 = new Graphics() //lag?
     //g.addChild(g2)
 
     // VIRUS ITSELF IS PROJECTILE (not the projectile it shoots)
@@ -154,7 +152,7 @@ export function makeVirus1(settings: VirusSettings,
                 //shoot at chosen critter
                 let chosenCritter = critters.get(chosenBody.label)
                 let vecToChosen = { x: chosenCritter.body.position.x - virusBody.position.x, y: chosenCritter.body.position.y - virusBody.position.y }
-                let dir = Matter.Vector.normalise(vecToChosen)
+                //let dir = Matter.Vector.normalise(vecToChosen)
 
                 // virus projectile body
                 const newProjRadius = 30 * (settings.scale || 1)
@@ -171,9 +169,9 @@ export function makeVirus1(settings: VirusSettings,
                 const newProjGraphics = new Graphics()
                 newProjGraphics.circle(0, 0, newProjRadius * 2)
                 newProjGraphics.fill(settings.color)
-                newProjGraphics.stroke({ width: newProjRadius / 32, color: 0xEEEEEE })
+                newProjGraphics.stroke({ width: newProjRadius / 8, color: 0x000000 })
 
-                let projCounterMs = 0
+                //let projCounterMs = 0
                 let newProj = projectileFactory.create({
                     x: virusBody.position.x,
                     y: virusBody.position.y,
@@ -214,17 +212,17 @@ export function makeVirus1(settings: VirusSettings,
 
     }
 
-    function projCustomUpdate(projCounterMs: number, newProjGraphics: Graphics, newProjRadius: number) {
-        // graphics animate
-        newProjGraphics.rotation = 12 * projCounterMs / 1000
-        newProjGraphics.ellipse(0, 0, newProjRadius * 2, newProjRadius + Math.sin(projCounterMs / 1000) * newProjRadius / 4)
-        newProjGraphics.fill(settings.color)
-    }
+    // function projCustomUpdate(projCounterMs: number, newProjGraphics: Graphics, newProjRadius: number) {
+    //     // graphics animate
+    //     newProjGraphics.rotation = 12 * projCounterMs / 1000
+    //     newProjGraphics.ellipse(0, 0, newProjRadius * 2, newProjRadius + Math.sin(projCounterMs / 1000) * newProjRadius / 4)
+    //     newProjGraphics.fill(settings.color)
+    // }
 
 }
 
 
-function makeVirusProjectile1(centerX: number, centerY: number,
-    engine: Matter.Engine, critters: EntityStore<Critter>, projectiles: EntityStore<Projectile>, projectileFactory: ProjectileFactory, rng: Random, waves: WaveHelper): ProjectileSettings {
+// function makeVirusProjectile1(centerX: number, centerY: number,
+//     engine: Matter.Engine, critters: EntityStore<Critter>, projectiles: EntityStore<Projectile>, projectileFactory: ProjectileFactory, rng: Random, waves: WaveHelper): ProjectileSettings {
 
-}
+// }

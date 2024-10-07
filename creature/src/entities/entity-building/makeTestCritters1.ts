@@ -1,7 +1,6 @@
 import { Random } from "random-js"
 import { Settings } from "../../Settings"
 import { Critter, CritterFactory } from "../CritterFactory"
-import { ceratron } from "./critters/ceratron"
 import { EntityStore } from "../EntityStore"
 
 
@@ -39,6 +38,7 @@ export function makeTestCritters(critterFactory: CritterFactory, rng: Random, cr
             scale: 1.3,
             movementSpeed: 4.4,
             projectileSpeed: 8.8,
+            projectileLifetime: 0.5,
             fireDelay: 2.2,
             name: "yello"
         })
