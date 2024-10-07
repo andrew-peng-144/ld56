@@ -17,7 +17,7 @@ export class Settings {
     static readonly VIRUS_LIMIT = 300
     static readonly CRITTER_LIMIT = 300
     
-    static readonly SPAWN_DELAY = 1000
+    static readonly SPAWN_DELAY = 20000
 
     static readonly collisionCategories = {
         DEFAULT: 0x0001,

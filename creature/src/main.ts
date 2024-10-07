@@ -147,6 +147,8 @@ async function main() {
     });
     // add the viewport to the stage
     app.stage.addChild(viewport)
+    // center on 0,0
+    viewport.position.set(Settings.V_WIDTH/2, Settings.V_HEIGHT/2)
     viewport.drag({
         mouseButtons: 'left-middle',
         //keyToPress: ['ShiftLeft']

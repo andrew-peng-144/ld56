@@ -222,6 +222,20 @@ export class TestScreen implements IScreen {
         this.app.stop()
         this.paused = true
         console.log("PAUSED TESTSCREEN");
+        // pause text
+        this.pausedText.text = `PAUSED (Esc)
+Left click - Select unit
+Right click - Attack/Move Selected Units
+Double click - Select group
+Shift click - Select group
+Middle/Right click - Pan
+Scroll - Zoom
+            Time: ${Math.floor(this.gameTime / 1000)}
+            Critters lost: ${this.numCrittersLost}
+            Critters remaining: ${this.critters.size()}
+            Viruses defeated: ${this.numVirusesDefeated}
+            KING: ${this.critters.search(critter => critter.name === Settings.CritterNames.YELLOW).length > 0 ? "ALIVE!" : "DEAD..."}
+                        `
         this.pausedText.visible = true
         this.app.render()
     }
@@ -252,11 +266,11 @@ export class TestScreen implements IScreen {
                 let resultsPoint = Matter.Query.point(this.engine.world.bodies, { x: this.mouseXMatter, y: this.mouseYMatter })
                 if (event.shiftKey) {
                     // shift click - select all around of same type as clicked
-                    
+
                     Matter.Body.setPosition(this.selectionCircle, { x: this.mouseXMatter, y: this.mouseYMatter })
                     let resultsCircle = Matter.Query.region(this.engine.world.bodies, this.selectionCircle.bounds)
 
-                    
+
                     // let clickedCircle: Matter.Body
                     // if (resultsPoint.length >= 1) {
                     //     clickedCircle = resultsPoint[0]
@@ -268,14 +282,14 @@ export class TestScreen implements IScreen {
                         ) {
                             //console.log("CLICKED CRITTER " + body.label);
                             if (this.critters.has(body.label)) {
-                                let clickedCircle = resultsPoint.find( body => this.critters.has(body.label) )// clicked circle needs to be a critter
+                                let clickedCircle = resultsPoint.find(body => this.critters.has(body.label))// clicked circle needs to be a critter
                                 if (clickedCircle && this.critters.has(clickedCircle.label)) {
                                     let critter = this.critters.get(body.label)
 
                                     if (critter.name === this.critters.get(clickedCircle.label).name
                                         && critter.team === Settings.teams.PLAYER) {
                                         console.log("NAME MATCHED");
-                                        
+
                                         let squareGraphics = makeSelectionSquare(critter)
                                         this.viewport.addChild(squareGraphics)
                                         this.selectionSquares.add({ c: critter, g: squareGraphics })
@@ -375,21 +389,46 @@ export class TestScreen implements IScreen {
             let critterSpawnRadiusMultMin = 0
             let critterSpawnRadiusMultMax = 1
 
-            if (this.numSpawns <= 5) {
+            if (this.numSpawns <= 3) {
                 virusStrength = 1
                 virusSpawnRadiusMultMin = 0.1
-                virusSpawnRadiusMultMax = 0.3
+                virusSpawnRadiusMultMax = 0.8
                 critterCount = 3
                 critterSpawnRadiusMultMin = 0.1
                 critterSpawnRadiusMultMax = 0.3
-            } else if (this.numSpawns <= 10) {
+            } else if (this.numSpawns <= 6) {
                 virusStrength = 2
-                critterCount = 4
-            } else {
-                virusStrength = 0
+                virusSpawnRadiusMultMin = 0.1
+                virusSpawnRadiusMultMax = 0.8
                 critterCount = 5
+                critterSpawnRadiusMultMin = 0.1
+                critterSpawnRadiusMultMax = 0.5
             }
-            if (this.virusCount < Settings.VIRUS_LIMIT) {
+            else if (this.numSpawns <= 9) {
+                virusStrength = 3
+                virusSpawnRadiusMultMin = 0.1
+                virusSpawnRadiusMultMax = 0.8
+                critterCount = 10
+                critterSpawnRadiusMultMin = 0.1
+                critterSpawnRadiusMultMax = 0.6
+            }
+            else if (this.numSpawns <= 12) {
+                virusStrength = 4
+                virusSpawnRadiusMultMin = 0.1
+                virusSpawnRadiusMultMax = 0.8
+                critterCount = 14
+                critterSpawnRadiusMultMin = 0.1
+                critterSpawnRadiusMultMax = 0.8
+            }
+            else {
+                virusStrength = 5
+                virusSpawnRadiusMultMin = 0.1
+                virusSpawnRadiusMultMax = 0.8
+                critterCount = 20
+                critterSpawnRadiusMultMin = 0.1
+                critterSpawnRadiusMultMax = 0.8
+            }
+            if (this.virusCount < Settings.VIRUS_LIMIT && this.virusCount > 0) {
                 spawnViruses(virusStrength,
                     virusSpawnRadiusMultMin,
                     virusSpawnRadiusMultMax,
@@ -415,38 +454,33 @@ export class TestScreen implements IScreen {
 
         // Update TEXTS
         // game over
-        let statsString = `
+        if (this.critters.size() === 0) {
+            // actually, just replace the pause text and force a pause.
+            this.gameOverText.text = `GAME OVER!
+            Time: ${Math.floor(this.gameTime / 1000)}
+            Critters lost: ${this.numCrittersLost}
+            Critters remaining: ${this.critters.size()}
+            Viruses defeated: ${this.numVirusesDefeated}
+            `
+            this.gameOverText.visible = true
+            this.gameTime -= time.deltaMS
+        }
+        // victory
+        if (this.virusCount <= 0) {
+            this.victoryText.text = `VICTORY!
             Time: ${Math.floor(this.gameTime / 1000)}
             Critters lost: ${this.numCrittersLost}
             Critters remaining: ${this.critters.size()}
             Viruses defeated: ${this.numVirusesDefeated}
             KING: ${this.critters.search(critter => critter.name === Settings.CritterNames.YELLOW).length > 0 ? "ALIVE!" : "DEAD..."}
-        `
-        if (this.critters.size() === 0) {
-            // actually, just replace the pause text and force a pause.
-            this.gameOverText.text = `GAME OVER!
-            ${statsString}
             `
-            this.gameOverText.visible = true
-        }
-        // victory
-        if (this.virusCount <= 0) {
-            this.victoryText.text = `VICTORY!
-            ${statsString}`
             this.victoryText.visible = true
+            this.gameTime -= time.deltaMS
+
         }
         // num critters
         this.numCrittersText.text = `${this.critters.size()}`
-        // pause text
-        this.pausedText.text = `PAUSED (Esc)
-Left click - Select unit
-Right click - Attack/Move Selected Units
-Double click - Select group
-Shift click - Select group
-Middle/Right click - Pan
-Scroll - Zoom
-${statsString}
-        `
+
 
 
         // step physics engine

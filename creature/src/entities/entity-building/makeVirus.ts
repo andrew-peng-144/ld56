@@ -82,11 +82,11 @@ export function makeVirus1(settings: VirusSettings,
     //maybe only show damage number if it does not have full health?
     viewport.addChild(hpCountText)
 
-    const targetingBeam = new Graphics()
-    targetingBeam.rect(0, 0, 50, 50)
-    targetingBeam.fill('gray')
-    targetingBeam.visible = false
-    viewport.addChild(targetingBeam)
+    // const targetingBeam = new Graphics()
+    // targetingBeam.rect(0, 0, 50, 50)
+    // targetingBeam.fill('gray')
+    // targetingBeam.visible = false
+    // viewport.addChild(targetingBeam)
 
 
    // let critterToSpawn = null
@@ -115,8 +115,8 @@ export function makeVirus1(settings: VirusSettings,
             // remove auxillary graphics of the entity
             viewport.removeChild(hpCountText)
             hpCountText.destroy()
-            viewport.removeChild(targetingBeam)
-            targetingBeam.destroy()
+            // viewport.removeChild(targetingBeam)
+            // targetingBeam.destroy()
         },
         totalHealth: settings.hp
 
@@ -169,7 +169,7 @@ export function makeVirus1(settings: VirusSettings,
                 const newProjGraphics = new Graphics()
                 newProjGraphics.circle(0, 0, newProjRadius * 2)
                 newProjGraphics.fill(settings.color)
-                newProjGraphics.stroke({ width: newProjRadius / 8, color: 0x000000 })
+                newProjGraphics.stroke({ width: newProjRadius / 4, color: 0x000000 })
 
                 //let projCounterMs = 0
                 let newProj = projectileFactory.create({
@@ -204,9 +204,9 @@ export function makeVirus1(settings: VirusSettings,
         g.roundRect(-virus_size, -virus_size, virus_size * 2, virus_size * 2, 50 * (settings.scale || 1))
         g.stroke({ width: (Math.sin(2 * msCounterAnim / 1000) * 10 + 15) * (settings.scale || 1), color: settings.color })
 
-        g.rotation = -0.5 * msCounterAnim / 1000
-        g.circle(0, 20, 20)
-        g.stroke({ width: 7 * (settings.scale || 1), color: settings.color })
+        // g.rotation = -0.5 * msCounterAnim / 1000
+        // g.circle(0, 20, 20)
+        // g.stroke({ width: 7 * (settings.scale || 1), color: settings.color })
 
         hpCountText.text = proj.health
 

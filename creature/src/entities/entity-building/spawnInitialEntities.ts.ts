@@ -9,50 +9,110 @@ import { Viewport } from "pixi-viewport";
 
 
 
-export function makeLevelLayout(engine: Matter.Engine, viewport: Viewport,  critters: EntityStore<Critter>, critterFactory: CritterFactory, projectiles: EntityStore<Projectile>, projectileFactory: ProjectileFactory, rng: Random) {
+export function makeLevelLayout(engine: Matter.Engine, viewport: Viewport, critters: EntityStore<Critter>, critterFactory: CritterFactory, projectiles: EntityStore<Projectile>, projectileFactory: ProjectileFactory, rng: Random) {
 
 
-    // hexagon
-    let scaleToBorder = 0.8
-    let radius = Settings.WORLD_RADIUS  * scaleToBorder
 
-    for (let deg = 0; deg < 360; deg += 60) {
-        spawnSupers(
-            radius
-            ,MyMath.toRadians(deg)
-            ,engine, viewport, critters, projectiles, projectileFactory, rng
-        )
-    }
 
+
+    spawnStartingViruses(engine, viewport, critters, projectiles, projectileFactory, rng)
     spawnStartingCritters(critterFactory, rng, critters)
 }
 
-function spawnSupers(r: number, t: number, engine: Matter.Engine, viewport: Viewport, critters: EntityStore<Critter>, projectiles: EntityStore<Projectile>, projectileFactory: ProjectileFactory, rng: Random) {
+function spawnStartingViruses(engine: Matter.Engine, viewport: Viewport, critters: EntityStore<Critter>, projectiles: EntityStore<Projectile>, projectileFactory: ProjectileFactory, rng: Random) {
 
-    let newVirus = projectileFactory.create(
-        makeVirus1(
-            {
-                centerX: r * Math.cos(t),
-                centerY: r * Math.sin(t),
-                color: 0x9999ff,
-                intervalMs: 30000,
-                projectileSpeed: 10.0,
-                projectileLifetime: 10,
-                hp: rng.integer(500,1500),
-                scale: 10
-            },
-            engine,
-            viewport,
-            critters,
-            projectiles,
-            projectileFactory,
-            rng
+    // weak starting viruses
+    for (let deg = 0; deg < 360; deg += 60) {
+        let scaleToBorder = 0.07
+        let radius = Settings.WORLD_RADIUS * scaleToBorder
+        let newVirus = projectileFactory.create(
+            makeVirus1(
+                {
+                    centerX: radius * Math.cos(MyMath.toRadians(deg)),
+                    centerY: radius * Math.sin(MyMath.toRadians(deg)),
+                    color: 0x006600,
+                    intervalMs: 2000,
+                    projectileSpeed: 10.0,
+                    projectileLifetime: 6,
+                    hp: rng.integer(10, 20),
+                    scale: 1.3
+                },
+                engine,
+                viewport,
+                critters,
+                projectiles,
+                projectileFactory,
+                rng
+            )
         )
-    )
+        let entityID = projectiles.add(newVirus)
+        newVirus.entityID = entityID
+        newVirus.body.label = entityID
+    }
 
-    let entityID = projectiles.add(newVirus)
-    newVirus.entityID = entityID
-    newVirus.body.label = entityID
+    // medium starting viruses
+    for (let deg = 0; deg < 360; deg += 60) {
+        let scaleToBorder = 0.4
+        let radius = Settings.WORLD_RADIUS * scaleToBorder
+        let newVirus = projectileFactory.create(
+            makeVirus1(
+                {
+                    centerX: radius * Math.cos(MyMath.toRadians(deg)),
+                    centerY: radius * Math.sin(MyMath.toRadians(deg)),
+                    color: 0x004d00,
+                    intervalMs: 10000,
+                    projectileSpeed: 10.0,
+                    projectileLifetime: 6,
+                    hp: rng.integer(50, 150),
+                    scale: 5
+                },
+                engine,
+                viewport,
+                critters,
+                projectiles,
+                projectileFactory,
+                rng
+            )
+        )
+        let entityID = projectiles.add(newVirus)
+        newVirus.entityID = entityID
+        newVirus.body.label = entityID
+    }
+
+
+
+    // SUPER VIRUSES
+    // hexagon
+    for (let deg = 0; deg < 360; deg += 60) {
+        let scaleToBorder = 0.8
+        let radius = Settings.WORLD_RADIUS * scaleToBorder
+
+        let newSuper = projectileFactory.create(
+            makeVirus1(
+                {
+                    centerX: radius * Math.cos(MyMath.toRadians(deg)),
+                    centerY: radius * Math.sin(MyMath.toRadians(deg)),
+                    color: 0x001a00,
+                    intervalMs: 30000,
+                    projectileSpeed: 10.0,
+                    projectileLifetime: 10,
+                    hp: rng.integer(500, 1500),
+                    scale: 10
+                },
+                engine,
+                viewport,
+                critters,
+                projectiles,
+                projectileFactory,
+                rng
+            )
+        )
+        let entityID = projectiles.add(newSuper)
+        newSuper.entityID = entityID
+        newSuper.body.label = entityID
+    }
+
+
 }
 
 function spawnStartingCritters(critterFactory: CritterFactory, rng: Random, critters: EntityStore<Critter>) {
