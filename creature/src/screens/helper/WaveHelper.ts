@@ -7,7 +7,7 @@ import { Critter } from "../../entities/CritterFactory"
 import { Random } from "random-js"
 
 
-export class WaveHelper {
+class WaveHelpera {
     readonly maxWave: number = 20
 
     readonly default_wave_interval = 2500

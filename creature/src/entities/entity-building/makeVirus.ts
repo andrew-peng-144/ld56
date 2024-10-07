@@ -11,7 +11,8 @@ import { Critter } from "../CritterFactory"
 import { Random } from "random-js"
 import { bohrMagnetonDependencies } from "mathjs"
 import { WaveHelper } from "../../screens/helper/WaveHelper"
-
+import { Text } from "pixi.js"
+import { Viewport } from "pixi-viewport"
 
 
 function makeVirusHelper() {
@@ -23,9 +24,10 @@ interface VirusSettings {
     centerY: number,
     color: number,
     projectileSpeed: number,
+    projectileLifetime: number
     intervalMs: number,
     hp?: number,
-    scale?: number
+    scale?: number,
 }
 
 /**
@@ -41,13 +43,12 @@ interface VirusSettings {
  * @returns 
  */
 export function makeVirus1(settings: VirusSettings,
-    engine: Matter.Engine, critters: EntityStore<Critter>, projectiles: EntityStore<Projectile>, projectileFactory: ProjectileFactory, rng: Random, waves: WaveHelper): ProjectileSettings {
+    engine: Matter.Engine, viewport: Viewport, critters: EntityStore<Critter>, projectiles: EntityStore<Projectile>, projectileFactory: ProjectileFactory, rng: Random): ProjectileSettings {
     /**
     * diameter of circle, matter units
     */
     let virus_size = 64 * (settings.scale || 1)
-    let vision_radius = 600
-    const projectile_lifetime = 8
+    let vision_radius = virus_size * 3
 
     const virusBody = Matter.Bodies.circle(
         settings.centerX,
@@ -71,16 +72,34 @@ export function makeVirus1(settings: VirusSettings,
         vision_radius
     )
     virusVision.isSensor = true
+    virusVision.isStatic = true //lags after 100+ objects without this, for some reason.
     Matter.World.addBody(engine.world, virusVision);
+
+
+    const hpCountText = new Text({ x: 0, y: 0, style: { fill: settings.color, fontSize: `${70 * (settings.scale || 1)}px` } })
+    hpCountText.text = "0"
+    hpCountText.anchor.set(0.5)
+    hpCountText.position.set(virusBody.position.x * 2, virusBody.position.y * 2)
+    hpCountText.visible = true
+    //maybe only show damage number if it does not have full health?
+    viewport.addChild(hpCountText)
+
+    const targetingBeam = new Graphics()
+    targetingBeam.rect(0, 0, 50, 50)
+    targetingBeam.fill('gray')
+    targetingBeam.visible = false
+    viewport.addChild(targetingBeam)
 
 
     let critterToSpawn = null
 
 
     let g = new Graphics() //animated in customUpdate below
+    //g.visible = false
     let g2 = new Graphics() //lag?
     //g.addChild(g2)
 
+    // VIRUS ITSELF IS PROJECTILE (not the projectile it shoots)
     return {
         lifetime: Infinity,
         speed: 0,
@@ -95,12 +114,17 @@ export function makeVirus1(settings: VirusSettings,
 
         onDelete: () => {
             Matter.World.remove(engine.world, virusVision)
+            // remove auxillary graphics of the entity
+            viewport.removeChild(hpCountText)
+            hpCountText.destroy()
+            viewport.removeChild(targetingBeam)
+            targetingBeam.destroy()
         },
         totalHealth: settings.hp
 
     }
 
-    function customUpdate(time: Ticker) {
+    function customUpdate(time: Ticker, proj: Projectile) {
 
         msCounterShoot += time.deltaMS
         msCounterAnim += time.deltaMS
@@ -124,6 +148,8 @@ export function makeVirus1(settings: VirusSettings,
                 }
             })
             if (playerBodies.length > 0) {
+                // ****************
+                // VIRUS SHOOT PROJECTILE
                 let chosenBody = rng.pick(playerBodies)
                 //shoot at chosen critter
                 let chosenCritter = critters.get(chosenBody.label)
@@ -143,25 +169,31 @@ export function makeVirus1(settings: VirusSettings,
                 newProjBody.collisionFilter.mask = Settings.collisionCategories.PROJECTILE | Settings.collisionCategories.CRITTER | Settings.collisionCategories.WALL
                 // virus projectile graphics
                 const newProjGraphics = new Graphics()
-                newProjGraphics.ellipse(0, 0, newProjRadius * 2, newProjRadius)
+                newProjGraphics.circle(0, 0, newProjRadius * 2)
                 newProjGraphics.fill(settings.color)
+                newProjGraphics.stroke({ width: newProjRadius / 32, color: 0xEEEEEE })
 
+                let projCounterMs = 0
                 let newProj = projectileFactory.create({
                     x: virusBody.position.x,
                     y: virusBody.position.y,
                     startingDirection: Matter.Vector.angle(vecToChosen, { x: 0, y: 0 }) - Math.PI / 2,
-                    lifetime: projectile_lifetime,
+                    lifetime: settings.projectileLifetime,
                     speed: settings.projectileSpeed,
                     team: Settings.teams.ENEMY,
                     body: newProjBody,
-                    graphics: newProjGraphics
+                    graphics: newProjGraphics,
+                    // customUpdate: (time, proj) => {
+                    //     projCounterMs += time.deltaMS
+                    //     projCustomUpdate(projCounterMs, newProjGraphics, newProjRadius)
+                    // }
                 })
 
                 let entityID = projectiles.add(newProj)
                 newProj.entityID = entityID
                 newProj.body.label = entityID
             } else {
-                console.log('VIRUS ALERT: no player found');
+                //console.log('VIRUS ALERT: no player found');
             }
 
         }
@@ -171,14 +203,22 @@ export function makeVirus1(settings: VirusSettings,
         // graphics animate
         g.clear()
         g.rotation = 1.2 * msCounterAnim / 1000
-        g.roundRect(-virus_size, -virus_size, virus_size * 2, virus_size * 2, 50)
-        g.stroke({ width: Math.sin(2 * msCounterAnim / 1000) * 10 + 15, color: settings.color })
+        g.roundRect(-virus_size, -virus_size, virus_size * 2, virus_size * 2, 50 * (settings.scale || 1))
+        g.stroke({ width: (Math.sin(2 * msCounterAnim / 1000) * 10 + 15) * (settings.scale || 1), color: settings.color })
 
         g.rotation = -0.5 * msCounterAnim / 1000
         g.circle(0, 20, 20)
-        g.stroke({ width: 7, color: settings.color })
+        g.stroke({ width: 7 * (settings.scale || 1), color: settings.color })
 
+        hpCountText.text = proj.health
 
+    }
+
+    function projCustomUpdate(projCounterMs: number, newProjGraphics: Graphics, newProjRadius: number) {
+        // graphics animate
+        newProjGraphics.rotation = 12 * projCounterMs / 1000
+        newProjGraphics.ellipse(0, 0, newProjRadius * 2, newProjRadius + Math.sin(projCounterMs / 1000) * newProjRadius / 4)
+        newProjGraphics.fill(settings.color)
     }
 
 }

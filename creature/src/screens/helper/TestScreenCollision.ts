@@ -54,7 +54,7 @@ export function testScreenCollisionHandler (event: Matter.IEventCollision<Matter
                         ) {
                             // damage virus
                             enemyProj.health -= playerProj.damage
-                            console.log("DAMAGED "+enemyProj.entityID);
+                            //console.log("DAMAGED "+enemyProj.entityID);
                             if (enemyProj.health < 0) {
                                 enemyProj.toDestroy = true
                             }

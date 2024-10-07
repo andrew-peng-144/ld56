@@ -9,11 +9,15 @@ export function makeTestCritters(critterFactory: CritterFactory, rng: Random, cr
     
     let marked1 : string = ""
 
+    // SLOW LONGRAGNGE
     for (let i = 0; i < 45; i++) {
         let newCritter = critterFactory.create({
             x: i * 5,
             y: rng.integer(0, 500),
-            team: Settings.teams.PLAYER
+            team: Settings.teams.PLAYER,
+            projectileLifetime: 1.9,
+            projectileSpeed: 14,
+            fireDelay: 0.9
         })
 
         let entityID = critters.add(newCritter)
@@ -25,6 +29,7 @@ export function makeTestCritters(critterFactory: CritterFactory, rng: Random, cr
         
     }
 
+    // FAST SHORTRANGE
     for (let i = 0; i < 15; i++) {
         let newCritter = critterFactory.create({
             x: -i * 8 - 100,
@@ -34,6 +39,7 @@ export function makeTestCritters(critterFactory: CritterFactory, rng: Random, cr
             scale: 1.3,
             movementSpeed: 4.4,
             projectileSpeed: 8.8,
+            fireDelay: 2.2,
             name: "yello"
         })
 

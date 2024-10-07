@@ -16,6 +16,8 @@ import { testScreenCollisionHandler } from "./helper/TestScreenCollision";
 import { WaveHelper } from "./helper/WaveHelper";
 import { makePointer } from "../entities/entity-building/makePointer";
 import { makeBoundsCircle } from "../entities/entity-building/makeBounds";
+import { makeLevelLayout } from "../entities/spawnInitialEntities.ts";
+import { spawnCritters, spawnViruses } from "../entities/entity-building/spawnEntities";
 
 export class TestScreen implements IScreen {
 
@@ -38,6 +40,7 @@ export class TestScreen implements IScreen {
     gameOverText: Text
     waveNotificationText: Text
     victoryText: Text
+    numCrittersText: Text
 
     mouseEventX: number = 0
     mouseEventY: number = 0
@@ -61,11 +64,32 @@ export class TestScreen implements IScreen {
 
     //playerClickedOnAttackable: Matter.Body | null = null
 
-    waveHelper: WaveHelper
+    //waveHelper: WaveHelper
 
     pointerGraphic: Graphics
     readonly pointerGraphicLifeTimeMs: number = 800
     pointerGraphicMsCounter: number = 0
+
+
+    numVirusesDefeated: number = 0
+    numCrittersMax: number = 0
+    numCrittersLost: number = 0
+    score: number = 0
+
+    /**
+     * total elapsed ms since game began
+     */
+    gameTime: number = 0
+
+    /**
+     * track interval of spawner
+     */
+    spawnerMs: number = 0
+    /**
+     * number of times its spawned something
+     */
+    numSpawns: number = 0
+
 
 
     constructor(app: Application, viewport: Viewport, engine: Matter.Engine) {
@@ -106,7 +130,7 @@ export class TestScreen implements IScreen {
         this.projectiles = new EntityStore('Projectiles')
         this.critterFactory = new CritterFactory(engine, viewport)
         this.projectileFactory = new ProjectileFactory(engine, viewport)
-        this.waveHelper = new WaveHelper(this.projectiles, this.projectileFactory, engine, this.critters, this.rng)
+        //this.waveHelper = new WaveHelper(this.projectiles, this.projectileFactory, engine, this.critters, this.rng)
 
         // add test critters
         this.markedCritter1 = makeTestCritters(this.critterFactory, this.rng, this.critters)
@@ -131,14 +155,6 @@ export class TestScreen implements IScreen {
         app.stage.addChild(this.debugText)
         this.debugText.visible = Settings.debug_render
         this.pausedText = new Text({ x: 350, y: 100, style: { fill: 'black', fontSize: '63px' } })
-        this.pausedText.text = `PAUSED (Esc)
-Left click - Select unit
-Double click - Select group
-Shift click - Select group
-Middle/Right click - Pan
-Scroll - Zoom
-
-        `
         this.pausedText.visible = false
         app.stage.addChild(this.pausedText)
 
@@ -153,6 +169,9 @@ Scroll - Zoom
         this.waveNotificationText = new Text({ x: 350, y: 100, style: { fill: 'black', fontSize: '63px' } })
         this.waveNotificationText.visible = false
         app.stage.addChild(this.waveNotificationText)
+
+        this.numCrittersText = new Text({ x: Settings.V_WIDTH * 0.9, y: 100, style: { fill: 'black', fontSize: `${Settings.V_WIDTH / 32}px` } })
+        app.stage.addChild(this.numCrittersText)
 
 
         // add mouse events
@@ -183,7 +202,9 @@ Scroll - Zoom
         })
 
 
-
+        // create the level
+        makeLevelLayout(this.engine, this.viewport, this.critters, this.projectiles, this.projectileFactory, this.rng)
+        this.virusCount = 6
     }
     onEnter(prev: IScreen): void {
         throw new Error("Method not implemented.");
@@ -327,23 +348,74 @@ Scroll - Zoom
     onUpdate(time: Ticker): void {
 
 
-        // check if wave complete
-        this.waveHelper.update(time)
+        // spawn new critters/viruses on interval
+        this.spawnerMs += time.deltaMS
+        if (this.spawnerMs >= Settings.SPAWN_DELAY) {
+            this.spawnerMs -= Settings.SPAWN_DELAY
+            this.numSpawns++
+            let virusStrength = 0
+            let critterCount = 0
+            if (this.numSpawns <= 5) {
+                virusStrength = 1
+                critterCount = 3
+            } else if (this.numSpawns <= 10) {
+                virusStrength = 2
+                critterCount = 4
+            } else {
+                virusStrength = 0
+                critterCount = 5
+            }
+            if (false && this.virusCount < Settings.VIRUS_LIMIT) {
+                spawnViruses(virusStrength,
+                    this.engine, this.viewport, this.critters, this.projectiles, this.projectileFactory, this.rng
+                )
+            } else {
+                console.log('virus limit reached');
+            }
+            if (this.critters.size() < Settings.CRITTER_LIMIT) {
+                spawnCritters(critterCount,
+                    this.engine, this.viewport, this.critters, this.critterFactory, this.projectiles, this.projectileFactory, this.rng
+                )
+            } else {
+                console.log('critter limit reached');
+            }
 
+        }
+        // check if wave complete
+        //this.waveHelper.update(time)
+
+        // Update TEXTS
         // game over
+        let statsString = `
+            Time: ${Math.floor(this.gameTime / 1000)}
+            Critters lost: ${this.numCrittersLost}
+            Critters remaining: ${this.critters.size()}
+            Viruses defeated: ${this.numVirusesDefeated}
+        `
         if (this.critters.size() === 0) {
             // actually, just replace the pause text and force a pause.
             this.gameOverText.text = `GAME OVER!
-            Time: ${0}
-            Critters lost: ${0}
-            Critters remaining: ${0}
-            Viruses defeated: ${0}`
+            ${statsString}
+            `
             this.gameOverText.visible = true
         }
         // victory
-        if (this.waveHelper.getWaveNumber() > 15) {
-
+        if (this.virusCount <= 0) {
+            this.victoryText.text = `VICTORY!
+            ${statsString}`
+            this.victoryText.visible = true  
         }
+        // num critters
+        this.numCrittersText.text = `${this.critters.size()}`
+        // pause text
+        this.pausedText.text = `PAUSED (Esc)
+Left click - Select unit
+Double click - Select group
+Shift click - Select group
+Middle/Right click - Pan
+Scroll - Zoom
+${statsString}
+        `
 
 
         // step physics engine
@@ -355,10 +427,12 @@ Scroll - Zoom
         const screenHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
         //const scale = Math.min(screenWidth / Settings.V_WIDTH, screenHeight / Settings.V_HEIGHT);
         const scale = 1
-        this.engine.render.bounds.min.x = -this.viewport.x / 2 / this.viewport.scale.x
-        this.engine.render.bounds.max.x = -this.viewport.x / 2 / this.viewport.scale.x + Settings.V_WIDTH / 2 / this.viewport.scale.x
-        this.engine.render.bounds.min.y = -this.viewport.y / 2 / this.viewport.scale.y
-        this.engine.render.bounds.max.y = -this.viewport.y / 2 / this.viewport.scale.y + Settings.V_HEIGHT / 2 / this.viewport.scale.y
+        if (Settings.debug_render) {
+            this.engine.render.bounds.min.x = -this.viewport.x / 2 / this.viewport.scale.x
+            this.engine.render.bounds.max.x = -this.viewport.x / 2 / this.viewport.scale.x + Settings.V_WIDTH / 2 / this.viewport.scale.x
+            this.engine.render.bounds.min.y = -this.viewport.y / 2 / this.viewport.scale.y
+            this.engine.render.bounds.max.y = -this.viewport.y / 2 / this.viewport.scale.y + Settings.V_HEIGHT / 2 / this.viewport.scale.y
+        }
 
         this.mouseXVirtual = (this.mouseEventX - this.app.canvas.getBoundingClientRect().left) / scale
         this.mouseYVirtual = (this.mouseEventY - this.app.canvas.getBoundingClientRect().top) / scale
@@ -438,6 +512,7 @@ Scroll - Zoom
             if (critter.toDestroy) {
                 this.critterFactory.destroy(critter)
                 this.critters.remove(id)
+                this.numCrittersLost++
                 this.selectionSquares.forEach(square => {
                     if (square.c === critter) {
                         // so that destroyed critters that were selected have the square destroyed too
@@ -459,7 +534,7 @@ Scroll - Zoom
                 this.virusCount++
             }
             if (projectile.customUpdate) {
-                projectile.customUpdate(time)
+                projectile.customUpdate(time, projectile)
             }
             if (projectile.sprite) {
                 // TODO
@@ -480,14 +555,17 @@ Scroll - Zoom
                 if (projectile.onDelete) {
                     projectile.onDelete()
                 }
+                if (projectile.isVirus) {
+                    this.numVirusesDefeated++
+                }
                 this.projectileFactory.destroy(projectile)
                 this.projectiles.remove(id)
                 destroyedSomething = true
             }
         })
-        if (this.virusCount === 0 && destroyedSomething) {
-            this.waveHelper.nextWave()
-        }
+        // if (this.virusCount === 0 && destroyedSomething) {
+        //     this.waveHelper.nextWave()
+        // }
 
 
 
@@ -510,7 +588,7 @@ Scroll - Zoom
 pixiDelta(${round(time.deltaTime, 3)},${round(time.deltaMS, 3)})
 viewport(${this.viewport.x}, ${this.viewport.y}) 
 viewportboundsX(${this.viewport.getBounds().x}, ${this.viewport.getBounds().maxX})
-debugrendererX(${this.engine.render.bounds.min.x}, ${this.engine.render.bounds.max.x})
+
 scale(${this.viewport.scale.x}, ${this.viewport.scale.y})
 mousePosition(${this.mouseEventX}, ${this.mouseEventY})
 mousePosVirtual(${this.mouseXVirtual}, ${this.mouseYVirtual})
@@ -520,12 +598,16 @@ debugBody1(${this.debugBody1.position.x},${this.debugBody1.position.y})
 selectionSquareCount(${this.selectionSquares.size})
 projectileCount(${this.projectiles.size()})
 crittersCount(${this.critters.size()})
-wave(${this.waveHelper.getWaveNumber()})
 virusCount(${this.virusCount})
+gameTime(${this.gameTime})
 `
+        // debugrendererX(${this.engine.render.bounds.min.x}, ${this.engine.render.bounds.max.x})
         // markedCritter1Body(${this.critters.get(this.markedCritter1).body.position.x},${this.critters.get(this.markedCritter1).body.position.y})
         // markedCritter1Sprite(${this.critters.get(this.markedCritter1).graphics.position.x},${this.critters.get(this.markedCritter1).graphics.position.y})
+        // wave(${this.waveHelper.getWaveNumber()})
 
+
+        this.gameTime += time.deltaMS
     }
 
 }

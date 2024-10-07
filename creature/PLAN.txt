@@ -24,3 +24,4 @@ stuff to fix afterward
 - merge all entities into one - most were scrunched in critter or projectile which can easily be merged. they can still be in separate datastores for faster query
 - describe systems without oop. order of systems shouldn't matter much
 - coordinate systems between pixi, matter, and screen need to have easy conversion functions. lots of time wasted doing these by hand.
+- ideally all the organization is language/framework agnostic. so like component systems.

@@ -66,6 +66,9 @@ export class Projectile {
      */
     startingDirection: number
 
+    /**
+     * in seconds
+     */
     timeAlive: number = 0
     /**
      * in seconds
@@ -85,9 +88,9 @@ export class Projectile {
 
     damage: number = 0
 
-    customUpdate?: (time: Ticker) => void
+    customUpdate?: (time: Ticker, proj: Projectile) => void
 
-    onDelete?:() => void
+    onDelete?: () => void
 
     constructor(settings: ProjectileSettings) {
         this.startingDirection = settings.startingDirection
@@ -108,8 +111,8 @@ export class Projectile {
         this.damage = settings.damage || 1
 
 
-        const rectWidth = 7
-        const rectHeight = 23
+        const rectWidth = 14
+        const rectHeight = 46
 
         if (!settings.body) {
             const body = Matter.Bodies.rectangle(
@@ -164,6 +167,9 @@ export interface ProjectileSettings {
     startingDirection: number,
     critterOwner?: Critter,
     element?: string,
+    /**
+     * in seconds
+     */
     lifetime: number,
     speed: number
 
@@ -176,7 +182,7 @@ export interface ProjectileSettings {
     sprite?: Sprite
 
     color?: number
-    
+
     destructible?: boolean
     /**
      * only if destructible=true
@@ -196,9 +202,9 @@ export interface ProjectileSettings {
     /**
      * additional update function called every frame
      */
-    customUpdate?: (time: Ticker) => void
+    customUpdate?: (time: Ticker, proj: Projectile) => void
 
-    onDelete?:() => void
+    onDelete?: () => void
 
 
     isVirus?: boolean

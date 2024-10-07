@@ -187,13 +187,15 @@ async function main() {
             //showMousePosition: true,
             pixelRatio: 1,
             wireframes: true,
-            showVelocity: true,
-            showAngleIndicator: true,
+            //showVelocity: true,
+            //showAngleIndicator: true,
             showCollisions: true
         }
     })
-    Matter.Render.run(debug_renderer)
-    engine.render = debug_renderer
+    if (Settings.debug_render) {
+        Matter.Render.run(debug_renderer)
+        engine.render = debug_renderer
+    }
 
 
     // Global resize functino

@@ -4,9 +4,20 @@ export class Settings {
     static readonly V_WIDTH = 1920
     static readonly V_HEIGHT = 1080
 
-    static debug_render = false
+    static debug_render = true
     // debug_text
     // color_scheme
+
+    // ciruclar bounds
+    static readonly WORLD_RADIUS = 4000 //Matter units
+    static readonly WORLD_CENTER_X = 0
+    static readonly WORLD_CENTER_Y = 0
+    static readonly BOUND_COLOR = 0x349098//0x8b8b91
+
+    static readonly VIRUS_LIMIT = 300
+    static readonly CRITTER_LIMIT = 300
+    
+    static readonly SPAWN_DELAY = 1000
 
     static readonly collisionCategories = {
         DEFAULT: 0x0001,
@@ -54,7 +65,22 @@ export class Settings {
         ENEMY: 2,
     }
 
-    static selectionCircleRadius = 200
+    static readonly selectionCircleRadius = 500
+
+    static readonly critterColors = {
+        red: 0,
+        blue: 0,
+        green: 0,
+        yellow: 0,
+        purple: 0
+    }
+    static readonly virusColors = {
+        red: 0,
+        blue: 0,
+        green: 0,
+        yellow: 0,
+        purple: 0
+    }
 
     static readonly viruses = {
         easy: 1,
@@ -63,7 +89,7 @@ export class Settings {
         cyano: 4,
         hard: 5,
     }
-    
+
 
     static waves: Wave[] = [
         {
