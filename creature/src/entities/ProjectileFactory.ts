@@ -59,6 +59,7 @@ export class Projectile {
     graphics?: Graphics
     sprite?: Sprite
 
+
     speed: number
     /**
      * radians
@@ -142,7 +143,7 @@ export class Projectile {
             let graphics = new Graphics()
             graphics.pivot.set(rectWidth / 2, rectHeight / 2)
             graphics.rect(0, 0, rectWidth, rectHeight)
-            graphics.fill(0xFF0000);
+            graphics.fill(settings.color || 0xFF0000);
             //graphics.stroke({ width: 2, color: 0x1f2e2e });
 
             graphics.rotation = this.startingDirection
@@ -174,7 +175,8 @@ export interface ProjectileSettings {
     graphics?: Graphics
     sprite?: Sprite
 
-
+    color?: number
+    
     destructible?: boolean
     /**
      * only if destructible=true

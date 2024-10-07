@@ -47,6 +47,8 @@ export class Critter {
     body: Matter.Body
     graphics: Graphics
 
+    color?: number
+
     movementSpeed: number
     /**
      * in seconds
@@ -86,7 +88,7 @@ export class Critter {
     name: string
 
     constructor(settings: CritterSettings) {
-        this.movementSpeed = settings.movementSpeed || 1.1
+        this.movementSpeed = settings.movementSpeed || 2.1
         this.fireDelay = settings.fireDelay || 0.4
         this.power = settings.power || 4
         this.totalHealth = settings.totalHealth || 50
@@ -97,17 +99,17 @@ export class Critter {
         this.name = settings.name || "default"
 
         this.currentTarget = { x: 0, y: 0 }
-        this.currentTargetAttack = {x: -100, y: -100}
+        this.currentTargetAttack = {x: Infinity, y: Infinity}
         this.shouldAttack = false
         this.shouldMove = false
         this.sightRange = this.projectileSpeed * this.projectileLifetime * 60 //is it always 60?
         this.team = settings.team
 
-
+        this.color = settings.color
         // default body
         const triangleWidth = 40
         const triangleHeight = 65
-        const radius = 15 //MMATTER coords
+        const radius = 15 * (settings.scale || 1) //MMATTER coords
         if (!settings.body) {
 
             
@@ -130,14 +132,14 @@ export class Critter {
             let graphics = new Graphics() //new Graphics(settings.graphicsContext)
             
             graphics.circle(0, 0, radius * 2)
-            graphics.fill(0xdd0000);
-            graphics.stroke({ width: 2, color: 0x000000 });
+            graphics.fill(settings.color || 0xdd0000);
+            //graphics.stroke({ width: 2, color: 0x000000 });
             graphics.circle(radius * 1.8, radius * 1.8, radius / 1.5)
-            graphics.fill(0xdd0000)
-            graphics.stroke({ width: 2, color: 0x000000 });
+            graphics.fill(settings.color || 0xdd0000);
+            //graphics.stroke({ width: 2, color: 0x000000 });
             graphics.circle(-radius * 1.8, radius * 1.8, radius / 1.5)
-            graphics.fill(0xdd0000)
-            graphics.stroke({ width: 2, color: 0x000000 });
+            graphics.fill(settings.color || 0xdd0000)
+            //graphics.stroke({ width: 2, color: 0x000000 });
 
             // eyes
             graphics.circle(radius, -radius , radius / 2)
@@ -178,6 +180,9 @@ export interface CritterSettings {
 
     body?: Matter.Body
     graphics?: Graphics
+
+    color?: number
+    scale?: number
 
     /**
      * CENTER x

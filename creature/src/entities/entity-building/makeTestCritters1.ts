@@ -9,7 +9,7 @@ export function makeTestCritters(critterFactory: CritterFactory, rng: Random, cr
     
     let marked1 : string = ""
 
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 45; i++) {
         let newCritter = critterFactory.create({
             x: i * 5,
             y: rng.integer(0, 500),
@@ -18,37 +18,59 @@ export function makeTestCritters(critterFactory: CritterFactory, rng: Random, cr
 
         let entityID = critters.add(newCritter)
         newCritter.entityID = entityID
-        if (i === 5) {
+        if (i === 2) {
             marked1 = entityID
         }
         newCritter.body.label = entityID
+        
     }
-    for (let i = 0; i < 10; i++) {
-        let newCritter = critterFactory.create(
-            ceratron(
-                i * 5 + 500,
-                rng.integer(0, 500),
-                Settings.teams.ENEMY
-            )
-        )
+
+    for (let i = 0; i < 15; i++) {
+        let newCritter = critterFactory.create({
+            x: -i * 8 - 100,
+            y: rng.integer(0, 500),
+            team: Settings.teams.PLAYER,
+            color: 0x59b300,
+            scale: 1.3,
+            movementSpeed: 4.4,
+            projectileSpeed: 8.8,
+            name: "yello"
+        })
 
         let entityID = critters.add(newCritter)
         newCritter.entityID = entityID
+        if (i === 2) {
+            marked1 = entityID
+        }
         newCritter.body.label = entityID
+        
     }
-    for (let i = 0; i < 10; i++) {
-        let newCritter = critterFactory.create(
-            ceratron(
-                i * 5 + 1000,
-                rng.integer(0, 500),
-                Settings.teams.PLAYER
-            )
-        )
+    // for (let i = 0; i < 10; i++) {
+    //     let newCritter = critterFactory.create(
+    //         ceratron(
+    //             i * 5 + 500,
+    //             rng.integer(0, 500),
+    //             Settings.teams.ENEMY
+    //         )
+    //     )
 
-        let entityID = critters.add(newCritter)
-        newCritter.entityID = entityID
-        newCritter.body.label = entityID
-    }
+    //     let entityID = critters.add(newCritter)
+    //     newCritter.entityID = entityID
+    //     newCritter.body.label = entityID
+    // }
+    // for (let i = 0; i < 10; i++) {
+    //     let newCritter = critterFactory.create(
+    //         ceratron(
+    //             i * 5 + 1000,
+    //             rng.integer(0, 500),
+    //             Settings.teams.PLAYER
+    //         )
+    //     )
+
+    //     let entityID = critters.add(newCritter)
+    //     newCritter.entityID = entityID
+    //     newCritter.body.label = entityID
+    // }
 
     return marked1
 }

@@ -10,8 +10,8 @@ const WALL_WIDTH = 30
 
 //circle
 const WORLD_RADIUS = 1000 //Matter units
-const WORLD_CENTER_X = 250
-const WORLD_CENTER_Y = 175
+const WORLD_CENTER_X = 0
+const WORLD_CENTER_Y = 0
 const BOUND_COLOR = 0x349098//0x8b8b91
 
 const WORLD_WIDTH_2 = 1000

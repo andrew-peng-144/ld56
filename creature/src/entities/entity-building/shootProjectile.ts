@@ -25,7 +25,8 @@ export function shootProjectile(critter: Critter, time: Ticker, projectiles: Ent
                 critterOwner: critter,
                 lifetime: critter.projectileLifetime,
                 speed: critter.projectileSpeed,
-                team: critter.team
+                team: critter.team,
+                color: critter.color
             })
             newProj.body.collisionFilter.category = Settings.collisionCategories.PROJECTILE
             newProj.body.collisionFilter.mask = Settings.collisionCategories.PROJECTILE | Settings.collisionCategories.CRITTER | Settings.collisionCategories.WALL

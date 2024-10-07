@@ -35,6 +35,9 @@ export class TestScreen implements IScreen {
 
     debugText: Text
     pausedText: Text
+    gameOverText: Text
+    waveNotificationText: Text
+    victoryText: Text
 
     mouseEventX: number = 0
     mouseEventY: number = 0
@@ -49,6 +52,8 @@ export class TestScreen implements IScreen {
     mouseYVirtual: number = 0
     mouseXViewport: number = 0
     mouseYViewport: number = 0
+
+    virusCount: number = 0
 
 
     selectionSquares: Set<{ c: Critter, g: Graphics }>
@@ -88,7 +93,7 @@ export class TestScreen implements IScreen {
         this.debugBody1 = Matter.Bodies.rectangle(
             150, 250, 50, 50
         )
-        Matter.World.addBody(engine.world, this.debugBody1)
+        //Matter.World.addBody(engine.world, this.debugBody1)
 
 
 
@@ -119,15 +124,17 @@ export class TestScreen implements IScreen {
         viewport.addChild(this.pointerGraphic)
 
 
-        // Add debug text
+        // Add texts
         this.debugText = new Text({ x: 10, y: 450, style: { fill: 'black', fontSize: '23px' } })
         //this.debugText.width /= 2
         //this.debugText.height /= 2
         app.stage.addChild(this.debugText)
+        this.debugText.visible = Settings.debug_render
         this.pausedText = new Text({ x: 350, y: 100, style: { fill: 'black', fontSize: '63px' } })
         this.pausedText.text = `PAUSED (Esc)
 Left click - Select unit
-Shift+Left click - Select group
+Double click - Select group
+Shift click - Select group
 Middle/Right click - Pan
 Scroll - Zoom
 
@@ -135,6 +142,17 @@ Scroll - Zoom
         this.pausedText.visible = false
         app.stage.addChild(this.pausedText)
 
+        this.gameOverText = new Text({ x: 350, y: 100, style: { fill: 'black', fontSize: '63px' } })
+        this.gameOverText.visible = false
+        app.stage.addChild(this.gameOverText)
+
+        this.victoryText = new Text({ x: 350, y: 100, style: { fill: 'black', fontSize: '63px' } })
+        this.victoryText.visible = false
+        app.stage.addChild(this.victoryText)
+
+        this.waveNotificationText = new Text({ x: 350, y: 100, style: { fill: 'black', fontSize: '63px' } })
+        this.waveNotificationText.visible = false
+        app.stage.addChild(this.waveNotificationText)
 
 
         // add mouse events
@@ -151,6 +169,10 @@ Scroll - Zoom
                 default:
                     console.log(`Unknown button code up: ${event.button}`);
             }
+        })
+        // forward double click event to pixi
+        this.app.canvas.addEventListener('dblclick', (ev) => {
+            this.pointerDown({button: 0, shiftKey: true})
         })
 
 
@@ -192,7 +214,7 @@ Scroll - Zoom
     private pointerDown(event: FederatedPointerEvent) {
         switch (event.button) {
             case 0:
-
+                // LEFT click
                 // reset selection
                 this.selectionSquares.forEach(square => {
                     this.viewport.removeChild(square.g)
@@ -256,7 +278,7 @@ Scroll - Zoom
             case 1:
                 break;
             case 2:
-
+                // RIGHT click
                 this.pointerGraphicMsCounter = 0
                 if (this.selectionSquares.size > 0) {
                     this.pointerGraphic.visible = true
@@ -275,17 +297,17 @@ Scroll - Zoom
                                     && this.projectiles.has(clickedBody.label)
                                     && this.projectiles.get(clickedBody.label).isVirus) {
                                     found = true
-                                    console.log("AAA");
                                     let clickedCircle = resultsPoint[0]
                                     square.c.currentTargetAttack = { x: this.mouseXMatter, y: this.mouseYMatter }
+                                    console.log('now targeting VIRUS! '+clickedBody.label);
                                 }
                             })
                             if (!found) {
-                                square.c.currentTargetAttack = { x: -100, y: -100 }
+                                square.c.currentTargetAttack = { x: Infinity, y: Infinity }
                             }
 
                         } else {
-                            square.c.currentTargetAttack = { x: -100, y: -100 }
+                            square.c.currentTargetAttack = { x: Infinity, y: Infinity }
                         }
 
                         // if (this.playerClickedOnAttackable !== null) {
@@ -306,7 +328,22 @@ Scroll - Zoom
 
 
         // check if wave complete
-        //this.waveHelper.update(time)
+        this.waveHelper.update(time)
+
+        // game over
+        if (this.critters.size() === 0) {
+            // actually, just replace the pause text and force a pause.
+            this.gameOverText.text = `GAME OVER!
+            Time: ${0}
+            Critters lost: ${0}
+            Critters remaining: ${0}
+            Viruses defeated: ${0}`
+            this.gameOverText.visible = true
+        }
+        // victory
+        if (this.waveHelper.getWaveNumber() > 15) {
+
+        }
 
 
         // step physics engine
@@ -415,7 +452,12 @@ Scroll - Zoom
 
 
         // loop thru each projectile
+        this.virusCount = 0
+        let destroyedSomething = false
         this.projectiles.forEach((projectile: Projectile, id: string) => {
+            if (projectile.isVirus) {
+                this.virusCount++
+            }
             if (projectile.customUpdate) {
                 projectile.customUpdate(time)
             }
@@ -440,8 +482,12 @@ Scroll - Zoom
                 }
                 this.projectileFactory.destroy(projectile)
                 this.projectiles.remove(id)
+                destroyedSomething = true
             }
         })
+        if (this.virusCount === 0 && destroyedSomething) {
+            this.waveHelper.nextWave()
+        }
 
 
 
@@ -475,6 +521,7 @@ selectionSquareCount(${this.selectionSquares.size})
 projectileCount(${this.projectiles.size()})
 crittersCount(${this.critters.size()})
 wave(${this.waveHelper.getWaveNumber()})
+virusCount(${this.virusCount})
 `
         // markedCritter1Body(${this.critters.get(this.markedCritter1).body.position.x},${this.critters.get(this.markedCritter1).body.position.y})
         // markedCritter1Sprite(${this.critters.get(this.markedCritter1).graphics.position.x},${this.critters.get(this.markedCritter1).graphics.position.y})

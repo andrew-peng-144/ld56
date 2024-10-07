@@ -4,7 +4,7 @@ export class Settings {
     static readonly V_WIDTH = 1920
     static readonly V_HEIGHT = 1080
 
-    static debug_render = true
+    static debug_render = false
     // debug_text
     // color_scheme
 
@@ -76,24 +76,40 @@ export class Settings {
                 {
                     type: Settings.viruses.easy,
                     count: 3,
-                    predelay: 1000
+                    predelayMs: 2000
                 },
                 {
                     type: Settings.viruses.blue,
                     count: 1,
-                    predelay: 1000
+                    predelayMs: 2000
                 },
                 {
                     type: Settings.viruses.easy,
                     count: 5,
-                    predelay: 1000
+                    predelayMs: 3000
                 }
             ]
 
         },
         {
             num: 2,
-            viruses: []
+            viruses: [
+                {
+                    type: Settings.viruses.easy,
+                    count: 5,
+                    predelayMs: 2000
+                },
+                {
+                    type: Settings.viruses.blue,
+                    count: 2,
+                    predelayMs: 2000
+                },
+                {
+                    type: Settings.viruses.easy,
+                    count: 8,
+                    predelayMs: 3000
+                }
+            ]
 
         }
     ]

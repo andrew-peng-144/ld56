@@ -9,6 +9,8 @@ import { Random } from "random-js"
 
 export class WaveHelper {
     readonly maxWave: number = 20
+
+    readonly default_wave_interval = 2500
     private waveNumber: number = 0
     currentWave: Wave
 
@@ -30,7 +32,7 @@ export class WaveHelper {
         this.rng = rng
 
 
-        window.setTimeout(()=>{this.nextWave()}, 1000)
+        window.setTimeout(() => { this.nextWave() }, this.default_wave_interval)
 
     }
 
@@ -40,47 +42,89 @@ export class WaveHelper {
 
     private calledNext: boolean = false
     nextWave() {
-        //this.calledNext = true
+        this.calledNext = true
+    }
 
 
-        this.endWave(this.waveNumber)
+    update(time: Ticker) {
+        if (this.calledNext) {
+            this.calledNext = false
+            this.endWave(this.waveNumber)
 
-        if (this.waveNumber < this.maxWave) {
+            if (this.waveNumber < this.maxWave) {
 
-            window.setTimeout(() => {
                 this.waveNumber++
                 this.currentWave = Settings.waves[this.waveNumber]
                 this.startWave(this.waveNumber)
-            }, 1000)
 
+            } else {
+                console.log('gg');
+            }
         }
 
     }
 
+    private startWave(num: number) {
+        console.log("STARTING WAVE " + num);
 
-    private aupdate(time: Ticker) {
-        // if (this.calledNext) {
-        //     this.calledNext = false
-        // }
-
-        // if no enemies, goto next wave
-        // let found = false
-        // this.projectiles.forEach( proj => {
-        //     if (proj.isVirus) {
-        //         found = true;
-        //     }
-        // })
-        // if (!found) {
-        //     this.nextWave()
-        // }
+        for (let i = 0; i < this.currentWave.viruses.length; i++) {
+            let virusGroup = this.currentWave.viruses[i]
+            window.setTimeout(() => {
+                for (let j = 0; j < virusGroup.count; j++) {
+                    switch (virusGroup.type) {
+                        case Settings.viruses.easy:
+                            this.spawnEasy()
+                            break
+                        case Settings.viruses.blue:
+                            this.spawnBlue()
+                            break
+                    }
+                }
+            }, (virusGroup.predelayMs || 1000) * i)
+        }
 
     }
-
-    private startWave(num: number) {
-
+    private spawnEasy() {
         // spawn everything
+        let r = this.rng.real(100, 400)
+        let t = this.rng.real(0, Math.PI * 2)
         let newVirus = this.projectileFactory.create(
-            makeVirus1(120,150,
+            makeVirus1(
+                {
+                    centerX: r * Math.cos(t),
+                    centerY: r * Math.sin(t),
+                    color: 0x9999ff,
+                    intervalMs: 6000,
+                    projectileSpeed: 3.3,
+                    hp: 2
+                },
+                this.engine,
+                this.critters,
+                this.projectiles,
+                this.projectileFactory,
+                this.rng,
+                this
+            )
+        )
+
+        let entityID = this.projectiles.add(newVirus)
+        newVirus.entityID = entityID
+        newVirus.body.label = entityID
+    }
+    private spawnBlue() {
+        let r = this.rng.real(300, 700)
+        let t = this.rng.real(0, Math.PI * 2)
+        let newVirus = this.projectileFactory.create(
+            makeVirus1(
+                {
+                    centerX: r * Math.cos(t),
+                    centerY: r * Math.sin(t),
+                    color: 0x22ff,
+                    intervalMs: 4000,
+                    projectileSpeed: 4.4,
+                    hp: 5,
+                    scale: 1.5
+                },
                 this.engine,
                 this.critters,
                 this.projectiles,
@@ -107,6 +151,6 @@ export interface Wave {
     viruses: {
         type: number,
         count: number,
-        predelay?: number
+        predelayMs?: number
     }[]
 }

@@ -28,7 +28,7 @@ export function testScreenCollisionHandler (event: Matter.IEventCollision<Matter
 
                 if (critterEntity && projEntity) {
                     if (critterEntity.team !== projEntity.team) {
-                        console.log(`${pair.bodyA.label} collided with ${pair.bodyB.label} DIFF TEAMS`);
+                        //console.log(`${pair.bodyA.label} collided with ${pair.bodyB.label} DIFF TEAMS`);
 
                         if (projEntity.team === Settings.teams.ENEMY && critterEntity.team === Settings.teams.PLAYER
                             && !projEntity.isVirus //virus itself cant kill player, only its projectiles
@@ -44,9 +44,8 @@ export function testScreenCollisionHandler (event: Matter.IEventCollision<Matter
                 let projA = projectiles.has(pair.bodyA.label) ? projectiles.get(pair.bodyA.label) : null
                 let projB = projectiles.has(pair.bodyB.label) ? projectiles.get(pair.bodyB.label) : null
                 if (projA && projB) {
-                    console.log("OO");
                     if (projA.team !== projB.team) {
-                        console.log(`PROJ-PROJ ${pair.bodyA.label} collided with ${pair.bodyB.label} DIFF TEAMS`);
+                        //console.log(`PROJ-PROJ ${pair.bodyA.label} collided with ${pair.bodyB.label} DIFF TEAMS`);
                         let playerProj = projA.team === Settings.teams.PLAYER ? projA : projB
                         let enemyProj = projA === playerProj ? projB : projA
 
