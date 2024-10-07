@@ -2,7 +2,15 @@ import { Ticker } from "pixi.js"
 import { Critter } from "../CritterFactory"
 import { Settings } from "../../Settings"
 import { Projectile, ProjectileFactory } from "../ProjectileFactory"
+import { EntityStore } from "../EntityStore"
 
+/**
+ * PLAYER porjectile
+ * @param critter 
+ * @param time 
+ * @param projectiles 
+ * @param projectileFactory 
+ */
 export function shootProjectile(critter: Critter, time: Ticker, projectiles: EntityStore<Projectile>, projectileFactory: ProjectileFactory) {
     // only shoot if theres a target in range
     // shoot porjectiles
@@ -20,12 +28,12 @@ export function shootProjectile(critter: Critter, time: Ticker, projectiles: Ent
                 team: critter.team
             })
             newProj.body.collisionFilter.category = Settings.collisionCategories.PROJECTILE
-            newProj.body.collisionFilter.mask = Settings.collisionCategories.CRITTER
+            newProj.body.collisionFilter.mask = Settings.collisionCategories.PROJECTILE | Settings.collisionCategories.CRITTER | Settings.collisionCategories.WALL
             let entityID = projectiles.add(newProj)
             newProj.entityID = entityID
             newProj.body.label = entityID
         } else {
-            //alert('projectile limit reached')
+            console.log('projectile limit reached')
         }
 
     }

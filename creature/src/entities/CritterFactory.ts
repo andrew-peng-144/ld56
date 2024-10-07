@@ -1,5 +1,6 @@
 import Matter from "matter-js"
 import { Graphics, Container, Geometry } from "pixi.js"
+import { Settings } from "../Settings"
 
 export class CritterFactory {
     engine: Matter.Engine
@@ -40,6 +41,8 @@ export class CritterFactory {
 
 export class Critter {
     entityID: string = ""
+    toDestroy: boolean = false
+
 
     body: Matter.Body
     graphics: Graphics
@@ -94,7 +97,7 @@ export class Critter {
         this.name = settings.name || "default"
 
         this.currentTarget = { x: 0, y: 0 }
-        this.currentTargetAttack = {x: 0, y: 0}
+        this.currentTargetAttack = {x: -100, y: -100}
         this.shouldAttack = false
         this.shouldMove = false
         this.sightRange = this.projectileSpeed * this.projectileLifetime * 60 //is it always 60?
@@ -102,17 +105,20 @@ export class Critter {
 
 
         // default body
-        const triangleWidth = 20
-        const triangleHeight = 15
+        const triangleWidth = 40
+        const triangleHeight = 65
+        const radius = 15 //MMATTER coords
         if (!settings.body) {
 
-            const radius = 8
+            
             const body = Matter.Bodies.circle(
                 settings.x,
                 settings.y,
                 radius
             )
             this.body = body
+            body.collisionFilter.category = Settings.collisionCategories.CRITTER
+            body.collisionFilter.mask = Settings.collisionCategories.PROJECTILE | Settings.collisionCategories.CRITTER | Settings.collisionCategories.WALL
             //body.label = 'CRIT'
             //Matter.World.addBody(this.engine.world, body)
         } else {
@@ -122,16 +128,34 @@ export class Critter {
         // default graphics
         if (!settings.graphics) {
             let graphics = new Graphics() //new Graphics(settings.graphicsContext)
+            
+            graphics.circle(0, 0, radius * 2)
+            graphics.fill(0xdd0000);
+            graphics.stroke({ width: 2, color: 0x000000 });
+            graphics.circle(radius * 1.8, radius * 1.8, radius / 1.5)
+            graphics.fill(0xdd0000)
+            graphics.stroke({ width: 2, color: 0x000000 });
+            graphics.circle(-radius * 1.8, radius * 1.8, radius / 1.5)
+            graphics.fill(0xdd0000)
+            graphics.stroke({ width: 2, color: 0x000000 });
 
-            graphics.moveTo(triangleWidth / 2, 0)
-            graphics.lineTo(triangleWidth, triangleHeight)
-            graphics.lineTo(0, triangleHeight)
-            graphics.lineTo(triangleWidth / 2, 0)
-            graphics.fill(0xff00ff);
-            graphics.stroke({ width: 4, color: 0x6b6b47 });
-            //this.container.addChild(graphics)
-            //graphics.position.set(settings.x - triangleWidth / 2, settings.y - triangleHeight / 2) //not needed, as handled in update?
-            graphics.pivot.set(triangleWidth / 2, triangleHeight / 2)
+            // eyes
+            graphics.circle(radius, -radius , radius / 2)
+            graphics.fill(0x515c5d)
+            //graphics.stroke({ width: 2, color: 0xffffff });
+            graphics.circle(-radius, -radius , radius / 2)
+            graphics.fill(0x515c5d)
+            //graphics.stroke({ width: 2, color: 0xffffff });
+
+            // graphics.moveTo(triangleWidth / 2, 0)
+            // graphics.lineTo(triangleWidth, triangleHeight)
+            // graphics.lineTo(0, triangleHeight)
+            // graphics.lineTo(triangleWidth / 2, 0)
+            // graphics.fill(0xff0000);
+            // graphics.stroke({ width: 2, color: 0xd2d2d2 });
+            // //this.container.addChild(graphics)
+            // //graphics.position.set(settings.x - triangleWidth / 2, settings.y - triangleHeight / 2) //not needed, as handled in update?
+            // graphics.pivot.set(triangleWidth / 2, triangleHeight / 2)
 
 
             this.graphics = graphics

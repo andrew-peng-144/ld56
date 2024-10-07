@@ -37,8 +37,8 @@ function resize(app: Application, matter_debug_canvas: HTMLCanvasElement) {
     const screenHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
 
     // uniform scale for our game
-    const scale = Math.min(screenWidth / Settings.V_WIDTH, screenHeight / Settings.V_HEIGHT);
-
+    //const scale = Math.min(screenWidth / Settings.V_WIDTH, screenHeight / Settings.V_HEIGHT);
+    const scale = 1
 
     // the "uniformly englarged" size for our game
     let enlargedWidth = Math.floor(scale * Settings.V_WIDTH);
@@ -53,8 +53,8 @@ function resize(app: Application, matter_debug_canvas: HTMLCanvasElement) {
 
 
     // now we use css trickery to set the sizes and margins
-    app.canvas.style.width = `${enlargedWidth}px`;
-    app.canvas.style.height = `${enlargedHeight}px`;
+    // app.canvas.style.width = `${enlargedWidth}px`;
+    // app.canvas.style.height = `${enlargedHeight}px`;
     app.canvas.style.marginLeft = app.canvas.style.marginRight = `${horizontalMargin}px`;
     app.canvas.style.marginTop = app.canvas.style.marginBottom = `${verticalMargin}px`;
 
@@ -97,7 +97,7 @@ async function main() {
 
 
     await app.init({
-        background: 0x120e3b,
+        background: 0xd6f5f5, // 0x120e3b,
         //resizeTo: window, // incompatible with letterbox scale
         resolution: window.devicePixelRatio || 1,
         width: Settings.V_WIDTH,

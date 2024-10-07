@@ -1,6 +1,7 @@
 import Matter from "matter-js"
-import { Graphics, Container, Geometry } from "pixi.js"
+import { Graphics, Container, Geometry, Ticker, Sprite } from "pixi.js"
 import { Critter } from "./CritterFactory"
+import { Settings } from "../Settings"
 
 export class ProjectileFactory {
     engine: Matter.Engine
@@ -24,15 +25,22 @@ export class ProjectileFactory {
             x: proj.speed * Math.cos(proj.startingDirection - Math.PI / 2),
             y: proj.speed * Math.sin(proj.startingDirection - Math.PI / 2)
         })
-        this.stage.addChild(proj.graphics);
+        if (proj.sprite) {
+            this.stage.addChild(proj.sprite)
+        } else if (proj.graphics) {
+            this.stage.addChild(proj.graphics);
+        }
 
         return proj
     }
     destroy(proj: Projectile) {
         if (proj instanceof Projectile) {
             Matter.World.remove(this.engine.world, proj.body)
-            this.stage.removeChild(proj.graphics)
-            proj.graphics.destroy()
+            if (proj.graphics instanceof Graphics) {
+                this.stage.removeChild(proj.graphics)
+                proj.graphics.destroy()
+            }
+
         } else {
             throw 'canot destroy, invaldi projectile'
         }
@@ -45,9 +53,11 @@ export class ProjectileFactory {
 
 export class Projectile {
     entityID: string = ""
+    toDestroy: boolean = false
 
     body: Matter.Body
-    graphics: Graphics
+    graphics?: Graphics
+    sprite?: Sprite
 
     speed: number
     /**
@@ -61,7 +71,7 @@ export class Projectile {
      */
     readonly lifetime: number
 
-    critterOwner: Critter
+    critterOwner?: Critter
 
     element: string | null
 
@@ -70,18 +80,33 @@ export class Projectile {
     health: number
     totalHealth: number
 
+    isVirus: boolean
+
+    damage: number = 0
+
+    customUpdate?: (time: Ticker) => void
+
+    onDelete?:() => void
+
     constructor(settings: ProjectileSettings) {
         this.startingDirection = settings.startingDirection
         this.critterOwner = settings.critterOwner
         this.element = settings.element || null
 
         this.team = settings.team
+        this.customUpdate = settings.customUpdate;
+        this.onDelete = settings.onDelete;
 
         this.health = settings.totalHealth || 1
         this.totalHealth = settings.totalHealth || 1
 
+        this.isVirus = settings.isVirus || false
+
         this.lifetime = settings.lifetime
         this.speed = settings.speed
+        this.damage = settings.damage || 1
+
+
         const rectWidth = 7
         const rectHeight = 23
 
@@ -96,6 +121,8 @@ export class Projectile {
             body.isSensor = true
             body.frictionAir = 0
             body.isStatic = settings.stationary || false
+            body.collisionFilter.category = Settings.collisionCategories.PROJECTILE
+            body.collisionFilter.mask = Settings.collisionCategories.PROJECTILE | Settings.collisionCategories.CRITTER | Settings.collisionCategories.WALL
             //body.label = `PROJ`
 
 
@@ -107,24 +134,26 @@ export class Projectile {
             this.body = settings.body
         }
 
-        if (!settings.graphics) {
+        if (settings.sprite) {
+            this.sprite = settings.sprite
+        } else if (settings.graphics) {
+            this.graphics = settings.graphics
+        } else {
             let graphics = new Graphics()
             graphics.pivot.set(rectWidth / 2, rectHeight / 2)
             graphics.rect(0, 0, rectWidth, rectHeight)
-            graphics.fill(0x669999);
-            graphics.stroke({ width: 2, color: 0x1f2e2e });
+            graphics.fill(0xFF0000);
+            //graphics.stroke({ width: 2, color: 0x1f2e2e });
 
             graphics.rotation = this.startingDirection
             this.graphics = graphics
-        } else {
-            this.graphics = settings.graphics
         }
 
     }
 
 }
 
-interface ProjectileSettings {
+export interface ProjectileSettings {
 
     /**
      * CENTER x
@@ -132,16 +161,18 @@ interface ProjectileSettings {
     x: number,
     y: number,
     startingDirection: number,
-    critterOwner: Critter,
+    critterOwner?: Critter,
     element?: string,
     lifetime: number,
     speed: number
 
-    team: number
+    damage?: number
 
+    team: number
 
     body?: Matter.Body
     graphics?: Graphics
+    sprite?: Sprite
 
 
     destructible?: boolean
@@ -159,5 +190,15 @@ interface ProjectileSettings {
      * stationary part of map that critters attack for resources
      */
     isMiningNode?: boolean
+
+    /**
+     * additional update function called every frame
+     */
+    customUpdate?: (time: Ticker) => void
+
+    onDelete?:() => void
+
+
+    isVirus?: boolean
 
 }

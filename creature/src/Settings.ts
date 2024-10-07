@@ -1,6 +1,8 @@
+import { Wave } from "./screens/helper/WaveHelper"
+
 export class Settings {
-    static readonly V_WIDTH = 1200
-    static readonly V_HEIGHT = 720
+    static readonly V_WIDTH = 1920
+    static readonly V_HEIGHT = 1080
 
     static debug_render = true
     // debug_text
@@ -53,4 +55,47 @@ export class Settings {
     }
 
     static selectionCircleRadius = 200
+
+    static readonly viruses = {
+        easy: 1,
+        norma: 2,
+        blue: 3,
+        cyano: 4,
+        hard: 5,
+    }
+    
+
+    static waves: Wave[] = [
+        {
+            num: 0,
+            viruses: []
+        },
+        {
+            num: 1,
+            viruses: [
+                {
+                    type: Settings.viruses.easy,
+                    count: 3,
+                    predelay: 1000
+                },
+                {
+                    type: Settings.viruses.blue,
+                    count: 1,
+                    predelay: 1000
+                },
+                {
+                    type: Settings.viruses.easy,
+                    count: 5,
+                    predelay: 1000
+                }
+            ]
+
+        },
+        {
+            num: 2,
+            viruses: []
+
+        }
+    ]
+
 }
