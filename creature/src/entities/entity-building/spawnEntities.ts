@@ -23,7 +23,7 @@ export function spawnCritters(count: number, spawnRadiusMultMin: number, spawnRa
 
     switch (name) {
         case Settings.CritterNames.GREEN:
-            color = 0x59b300
+            color = 0x3333ff //blue lol
             scale = 1.3
             movementSpeed = 4.4
             projectileSpeed = 8.8
@@ -31,8 +31,9 @@ export function spawnCritters(count: number, spawnRadiusMultMin: number, spawnRa
             fireDelay = 0.4
             break
         default:
+            color = 0x59b300
             projectileLifetime = 1.9
-            projectileSpeed = 14
+            projectileSpeed = 6
             fireDelay = 0.8
             break
     }
@@ -49,7 +50,8 @@ export function spawnCritters(count: number, spawnRadiusMultMin: number, spawnRa
             fireDelay: fireDelay,
             movementSpeed: movementSpeed,
             scale: scale,
-            name: name
+            name: name,
+            color: color
         })
 
         let entityID = critters.add(newCritter)

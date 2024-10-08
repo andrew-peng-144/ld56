@@ -15,6 +15,7 @@ import { makeBoundsCircle } from "../entities/entity-building/makeBounds";
 import { makeLevelLayout } from "../entities/entity-building/spawnInitialEntities.ts.ts";
 import { spawnCritters, spawnViruses } from "../entities/entity-building/spawnEntities";
 import Matter from "matter-js";
+import { makeTestCritters } from "../entities/entity-building/makeTestCritters1.ts";
 
 export class TestScreen implements IScreen {
 
@@ -38,6 +39,7 @@ export class TestScreen implements IScreen {
     waveNotificationText: Text
     victoryText: Text
     numCrittersText: Text
+    timerText: Text
 
     mouseEventX: number = 0
     mouseEventY: number = 0
@@ -169,6 +171,8 @@ export class TestScreen implements IScreen {
 
         this.numCrittersText = new Text({ x: Settings.V_WIDTH * 0.9, y: 100, style: { fill: 'black', fontSize: `${Settings.V_WIDTH / 32}px` } })
         app.stage.addChild(this.numCrittersText)
+        this.timerText = new Text({ x: Settings.V_WIDTH * 0.1, y: 100, style: { fill: 'black', fontSize: `${Settings.V_WIDTH / 32}px` } })
+        app.stage.addChild(this.timerText)
 
 
         // add mouse events
@@ -381,7 +385,7 @@ Scroll - Zoom
         this.spawnerMs += time.deltaMS
         if (this.spawnerMs >= Settings.SPAWN_DELAY) {
             this.spawnerMs -= Settings.SPAWN_DELAY
-            //this.numSpawns++
+            this.numSpawns++
             let virusStrength = 0
             let virusSpawnRadiusMultMin = 0
             let virusSpawnRadiusMultMax = 1
@@ -391,23 +395,23 @@ Scroll - Zoom
 
             if (this.numSpawns <= 3) {
                 virusStrength = 1
-                virusSpawnRadiusMultMin = 0.1
-                virusSpawnRadiusMultMax = 0.8
+                virusSpawnRadiusMultMin = 0.07
+                virusSpawnRadiusMultMax = 0.3
                 critterCount = 3
-                critterSpawnRadiusMultMin = 0.1
-                critterSpawnRadiusMultMax = 0.3
+                critterSpawnRadiusMultMin = 0.05
+                critterSpawnRadiusMultMax = 0.15
             } else if (this.numSpawns <= 6) {
                 virusStrength = 2
                 virusSpawnRadiusMultMin = 0.1
-                virusSpawnRadiusMultMax = 0.8
+                virusSpawnRadiusMultMax = 0.45
                 critterCount = 5
                 critterSpawnRadiusMultMin = 0.1
-                critterSpawnRadiusMultMax = 0.5
+                critterSpawnRadiusMultMax = 0.3
             }
             else if (this.numSpawns <= 9) {
                 virusStrength = 3
                 virusSpawnRadiusMultMin = 0.1
-                virusSpawnRadiusMultMax = 0.8
+                virusSpawnRadiusMultMax = 0.6
                 critterCount = 10
                 critterSpawnRadiusMultMin = 0.1
                 critterSpawnRadiusMultMax = 0.6
@@ -441,7 +445,7 @@ Scroll - Zoom
                 spawnCritters(critterCount,
                     critterSpawnRadiusMultMin,
                     critterSpawnRadiusMultMax,
-                    Settings.CritterNames.GREEN,
+                    this.rng.pick([Settings.CritterNames.GREEN, Settings.CritterNames.RED]),
                     this.engine, this.viewport, this.critters, this.critterFactory, this.projectiles, this.projectileFactory, this.rng
                 )
             } else {
@@ -452,6 +456,7 @@ Scroll - Zoom
         // check if wave complete
         //this.waveHelper.update(time)
 
+        //////////
         // Update TEXTS
         // game over
         if (this.critters.size() === 0) {
@@ -480,6 +485,8 @@ Scroll - Zoom
         }
         // num critters
         this.numCrittersText.text = `${this.critters.size()}`
+        // timer
+        this.timerText.text = `${this.gameTime}`
 
 
 

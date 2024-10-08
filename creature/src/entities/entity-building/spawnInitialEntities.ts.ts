@@ -31,8 +31,8 @@ function spawnStartingViruses(engine: Matter.Engine, viewport: Viewport, critter
                     centerX: radius * Math.cos(MyMath.toRadians(deg)),
                     centerY: radius * Math.sin(MyMath.toRadians(deg)),
                     color: 0x006600,
-                    intervalMs: 2000,
-                    projectileSpeed: 10.0,
+                    intervalMs: 4000,
+                    projectileSpeed: 4.0,
                     projectileLifetime: 6,
                     hp: rng.integer(10, 20),
                     scale: 1.3
@@ -61,7 +61,7 @@ function spawnStartingViruses(engine: Matter.Engine, viewport: Viewport, critter
                     centerY: radius * Math.sin(MyMath.toRadians(deg)),
                     color: 0x004d00,
                     intervalMs: 10000,
-                    projectileSpeed: 10.0,
+                    projectileSpeed: 7.0,
                     projectileLifetime: 6,
                     hp: rng.integer(50, 150),
                     scale: 5
@@ -94,7 +94,7 @@ function spawnStartingViruses(engine: Matter.Engine, viewport: Viewport, critter
                     centerY: radius * Math.sin(MyMath.toRadians(deg)),
                     color: 0x001a00,
                     intervalMs: 30000,
-                    projectileSpeed: 10.0,
+                    projectileSpeed: 17.0,
                     projectileLifetime: 10,
                     hp: rng.integer(500, 1500),
                     scale: 10
@@ -123,7 +123,7 @@ function spawnStartingCritters(critterFactory: CritterFactory, rng: Random, crit
         y: 0,
         team: Settings.teams.PLAYER,
         movementSpeed: 5.5,
-        projectileLifetime: 0.5,
+        projectileLifetime: 0.65,
         projectileSpeed: 25,
         fireDelay: 0.08,
         color: 0xe6b800,

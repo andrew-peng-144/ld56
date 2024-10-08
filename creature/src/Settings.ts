@@ -4,7 +4,7 @@ export class Settings {
     static readonly V_WIDTH = 1920
     static readonly V_HEIGHT = 1080
 
-    static debug_render = true
+    static debug_render = false
     // debug_text
     // color_scheme
 
@@ -71,7 +71,7 @@ export class Settings {
         ENEMY: 2,
     }
 
-    static readonly selectionCircleRadius = 500
+    static readonly selectionCircleRadius = 2000
 
     // static readonly critterColors = {
     //     red: 0,

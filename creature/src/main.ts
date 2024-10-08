@@ -152,8 +152,11 @@ async function main() {
     viewport.drag({
         mouseButtons: 'left-middle',
         //keyToPress: ['ShiftLeft']
+        
     });
-    viewport.wheel();
+    viewport.wheel({
+        smooth: 20
+    });
 
 
 
