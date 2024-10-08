@@ -8,15 +8,14 @@ import { Settings } from "../../Settings";
 
 
 const virus_spawn_count = 3
-export function spawnCritters(count: number, spawnRadiusMultMin: number, spawnRadiusMultMax: number, name: string, engine: Matter.Engine, viewport: Viewport, critters: EntityStore<Critter>, critterFactory: CritterFactory, projectiles: EntityStore<Projectile>, projectileFactory: ProjectileFactory, rng: Random) {
+export function spawnCritters(count: number, spawnRadiusMultMin: number, spawnRadiusMultMax: number, name: string, _engine: Matter.Engine, _viewport: Viewport, critters: EntityStore<Critter>, critterFactory: CritterFactory, _projectiles: EntityStore<Projectile>, _projectileFactory: ProjectileFactory, rng: Random) {
     let scaleToBorder = 0.8
     let spawnRadius = Settings.WORLD_RADIUS * scaleToBorder
 
-    let intervalMs = 0,
+    let 
         projectileSpeed = 0,
         projectileLifetime = 4,
         movementSpeed = 4,
-        hp = 1,
         scale = 1,
         color = 0,
         fireDelay = 1.0

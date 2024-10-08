@@ -1,6 +1,6 @@
 import { Viewport } from "pixi-viewport";
 import { IScreen } from "./IScreen";
-import { Sprite, Assets, Application, Ticker, Text, FederatedPointerEvent, Graphics } from "pixi.js";
+import {  Application, Ticker, Text, FederatedPointerEvent, Graphics } from "pixi.js";
 import { EntityStore } from "../entities/EntityStore";
 import { Random } from "random-js";
 import { Settings } from "../Settings";
@@ -15,13 +15,12 @@ import { makeBoundsCircle } from "../entities/entity-building/makeBounds";
 import { makeLevelLayout } from "../entities/entity-building/spawnInitialEntities.ts.ts";
 import { spawnCritters, spawnViruses } from "../entities/entity-building/spawnEntities";
 import Matter from "matter-js";
-import { makeTestCritters } from "../entities/entity-building/makeTestCritters1.ts";
 
 export class TestScreen implements IScreen {
 
     // should be moved to a SceneContainer
 
-    bunny: Sprite
+    //bunny: Sprite
     engine: Matter.Engine
     app: Application
     viewport: Viewport
@@ -191,7 +190,8 @@ export class TestScreen implements IScreen {
             }
         })
         // forward double click event to pixi
-        this.app.canvas.addEventListener('dblclick', (ev) => {
+        this.app.canvas.addEventListener('dblclick', (_ev) => {
+            // @ts-ignore
             this.pointerDown({ button: 0, shiftKey: true })
         })
 
@@ -214,10 +214,10 @@ export class TestScreen implements IScreen {
         makeLevelLayout(this.engine, this.viewport, this.critters, this.critterFactory, this.projectiles, this.projectileFactory, this.rng)
         this.virusCount = 6
     }
-    onEnter(prev: IScreen): void {
+    onEnter(_prev: IScreen): void {
         throw new Error("Method not implemented.");
     }
-    onExit(next: IScreen): void {
+    onExit(_next: IScreen): void {
         throw new Error("Method not implemented.");
     }
 
@@ -349,7 +349,7 @@ Scroll - Zoom
                                     && this.projectiles.has(clickedBody.label)
                                     && this.projectiles.get(clickedBody.label).isVirus) {
                                     found = true
-                                    let clickedCircle = resultsPoint[0]
+                                    //let clickedCircle = resultsPoint[0]
                                     square.c.currentTargetAttack = { x: this.mouseXMatter, y: this.mouseYMatter }
                                     console.log('now targeting VIRUS! ' + clickedBody.label);
                                 }
@@ -495,8 +495,8 @@ Scroll - Zoom
 
 
         // pan/scale debug renderer
-        const screenWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
-        const screenHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+        // const screenWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+        // const screenHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
         //const scale = Math.min(screenWidth / Settings.V_WIDTH, screenHeight / Settings.V_HEIGHT);
         const scale = 1
         if (Settings.debug_render) {
@@ -532,7 +532,7 @@ Scroll - Zoom
 
 
             let vecToTargetAttack = { x: critter.currentTargetAttack.x - critter.body.position.x, y: critter.currentTargetAttack.y - critter.body.position.y }
-            let dirAttack = Matter.Vector.normalise(vecToTargetAttack)
+            //let dirAttack = Matter.Vector.normalise(vecToTargetAttack)
             let vecToTargetMove = { x: critter.currentTarget.x - critter.body.position.x, y: critter.currentTarget.y - critter.body.position.y }
             let dirMove = Matter.Vector.normalise(vecToTargetMove)
             if (critter.shouldAttack) {

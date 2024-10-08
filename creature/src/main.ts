@@ -1,10 +1,8 @@
-import { Application, Assets, TexturePool } from 'pixi.js';
-import { Game } from './GameRoot'
-import MainLoop from "mainloop.js";
-import Matter, { Composite } from "matter-js";
+
+import Matter from "matter-js";
 
 import { Viewport } from "pixi-viewport";
-import { Application, Assets, Sprite, Texture, TextureStyle, Ticker, TickerCallback } from "pixi.js";
+import { Application, Assets,Ticker} from "pixi.js";
 import { TestScreen } from "./screens/TestScreen";
 import './style.css'
 import { IScreen } from './screens/IScreen';
@@ -130,7 +128,7 @@ async function main() {
 
     }, false)
 
-    window.addEventListener('keyup', event => {
+    window.addEventListener('keyup', _event => {
         
     }, false)
 

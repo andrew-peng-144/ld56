@@ -1,4 +1,3 @@
-import { Wave } from "./screens/helper/WaveHelper"
 
 export class Settings {
     static readonly V_WIDTH = 1920
