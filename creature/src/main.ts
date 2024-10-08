@@ -110,6 +110,9 @@ async function main() {
     app.canvas.addEventListener("contextmenu", (e) => {
         e.preventDefault();
     });
+    app.canvas.addEventListener("wheel", (e) => {
+        e.preventDefault();
+    });
     document.body.appendChild(app.canvas);
 
 
@@ -154,7 +157,9 @@ async function main() {
     });
     viewport.wheel({
         smooth: 20
+        
     });
+    viewport.setZoom(0.16)
 
 
 

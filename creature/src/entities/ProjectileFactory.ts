@@ -111,8 +111,8 @@ export class Projectile {
         this.damage = settings.damage || 1
 
 
-        const rectWidth = 14
-        const rectHeight = 46
+        const rectWidth = 14 * 4
+        const rectHeight = 46 * 4
 
         if (!settings.body) {
             const body = Matter.Bodies.rectangle(
@@ -145,7 +145,7 @@ export class Projectile {
         } else {
             let graphics = new Graphics()
             graphics.pivot.set(rectWidth / 2, rectHeight / 2)
-            graphics.rect(0, 0, rectWidth, rectHeight)
+            graphics.roundRect(0, 0, rectWidth, rectHeight, 20)
             graphics.fill(settings.color || 0xFF0000);
             //graphics.stroke({ width: 2, color: 0x1f2e2e });
 

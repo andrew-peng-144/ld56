@@ -4,8 +4,8 @@ import { Graphics } from "pixi.js";
 export function makePointer() : Graphics{
     let g = new Graphics()
 
-    g.circle(0,0,10)
-    g.stroke({ width: 2, color: 0xFF0000 });
+    g.circle(0,0,50)
+    g.stroke({ width: 15, color: 0xFF0000 });
     return g
 
 

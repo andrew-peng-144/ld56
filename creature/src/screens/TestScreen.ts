@@ -393,34 +393,34 @@ Scroll - Zoom
             let critterSpawnRadiusMultMin = 0
             let critterSpawnRadiusMultMax = 1
 
-            if (this.numSpawns <= 3) {
+            if (this.numSpawns <= 2) {
                 virusStrength = 1
                 virusSpawnRadiusMultMin = 0.07
                 virusSpawnRadiusMultMax = 0.3
                 critterCount = 3
                 critterSpawnRadiusMultMin = 0.05
                 critterSpawnRadiusMultMax = 0.15
-            } else if (this.numSpawns <= 6) {
+            } else if (this.numSpawns <= 4) {
                 virusStrength = 2
                 virusSpawnRadiusMultMin = 0.1
                 virusSpawnRadiusMultMax = 0.45
-                critterCount = 5
+                critterCount = 10
                 critterSpawnRadiusMultMin = 0.1
                 critterSpawnRadiusMultMax = 0.3
             }
-            else if (this.numSpawns <= 9) {
+            else if (this.numSpawns <= 6) {
                 virusStrength = 3
                 virusSpawnRadiusMultMin = 0.1
                 virusSpawnRadiusMultMax = 0.6
-                critterCount = 10
+                critterCount = 15
                 critterSpawnRadiusMultMin = 0.1
                 critterSpawnRadiusMultMax = 0.6
             }
-            else if (this.numSpawns <= 12) {
+            else if (this.numSpawns <= 8) {
                 virusStrength = 4
                 virusSpawnRadiusMultMin = 0.1
                 virusSpawnRadiusMultMax = 0.8
-                critterCount = 14
+                critterCount = 20
                 critterSpawnRadiusMultMin = 0.1
                 critterSpawnRadiusMultMax = 0.8
             }
@@ -428,7 +428,7 @@ Scroll - Zoom
                 virusStrength = 5
                 virusSpawnRadiusMultMin = 0.1
                 virusSpawnRadiusMultMax = 0.8
-                critterCount = 20
+                critterCount = 30
                 critterSpawnRadiusMultMin = 0.1
                 critterSpawnRadiusMultMax = 0.8
             }

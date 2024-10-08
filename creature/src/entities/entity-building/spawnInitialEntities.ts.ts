@@ -21,34 +21,34 @@ export function makeLevelLayout(engine: Matter.Engine, viewport: Viewport, critt
 
 function spawnStartingViruses(engine: Matter.Engine, viewport: Viewport, critters: EntityStore<Critter>, projectiles: EntityStore<Projectile>, projectileFactory: ProjectileFactory, rng: Random) {
 
-    // weak starting viruses
-    for (let deg = 0; deg < 360; deg += 60) {
-        let scaleToBorder = 0.07
-        let radius = Settings.WORLD_RADIUS * scaleToBorder
-        let newVirus = projectileFactory.create(
-            makeVirus1(
-                {
-                    centerX: radius * Math.cos(MyMath.toRadians(deg)),
-                    centerY: radius * Math.sin(MyMath.toRadians(deg)),
-                    color: 0x006600,
-                    intervalMs: 4000,
-                    projectileSpeed: 4.0,
-                    projectileLifetime: 6,
-                    hp: rng.integer(10, 20),
-                    scale: 1.3
-                },
-                engine,
-                viewport,
-                critters,
-                projectiles,
-                projectileFactory,
-                rng
-            )
-        )
-        let entityID = projectiles.add(newVirus)
-        newVirus.entityID = entityID
-        newVirus.body.label = entityID
-    }
+    // // weak starting viruses
+    // for (let deg = 0; deg < 360; deg += 60) {
+    //     let scaleToBorder = 0.07
+    //     let radius = Settings.WORLD_RADIUS * scaleToBorder
+    //     let newVirus = projectileFactory.create(
+    //         makeVirus1(
+    //             {
+    //                 centerX: radius * Math.cos(MyMath.toRadians(deg)),
+    //                 centerY: radius * Math.sin(MyMath.toRadians(deg)),
+    //                 color: 0x006600,
+    //                 intervalMs: 4000,
+    //                 projectileSpeed: 4.0,
+    //                 projectileLifetime: 6,
+    //                 hp: rng.integer(10, 20),
+    //                 scale: 2.6
+    //             },
+    //             engine,
+    //             viewport,
+    //             critters,
+    //             projectiles,
+    //             projectileFactory,
+    //             rng
+    //         )
+    //     )
+    //     let entityID = projectiles.add(newVirus)
+    //     newVirus.entityID = entityID
+    //     newVirus.body.label = entityID
+    // }
 
     // medium starting viruses
     for (let deg = 0; deg < 360; deg += 60) {
@@ -63,8 +63,8 @@ function spawnStartingViruses(engine: Matter.Engine, viewport: Viewport, critter
                     intervalMs: 10000,
                     projectileSpeed: 7.0,
                     projectileLifetime: 6,
-                    hp: rng.integer(50, 150),
-                    scale: 5
+                    hp: rng.integer(30, 60),
+                    scale: 10
                 },
                 engine,
                 viewport,
@@ -96,8 +96,8 @@ function spawnStartingViruses(engine: Matter.Engine, viewport: Viewport, critter
                     intervalMs: 30000,
                     projectileSpeed: 17.0,
                     projectileLifetime: 10,
-                    hp: rng.integer(500, 1500),
-                    scale: 10
+                    hp: rng.integer(200, 400),
+                    scale: 20
                 },
                 engine,
                 viewport,
@@ -122,12 +122,12 @@ function spawnStartingCritters(critterFactory: CritterFactory, _rng: Random, cri
         x: 0,
         y: 0,
         team: Settings.teams.PLAYER,
-        movementSpeed: 5.5,
+        movementSpeed: 10.0,
         projectileLifetime: 0.65,
-        projectileSpeed: 25,
+        projectileSpeed: 50,
         fireDelay: 0.08,
         color: 0xe6b800,
-        scale: 2.2,
+        scale: 5.5,
         name: Settings.CritterNames.YELLOW
     })
 
