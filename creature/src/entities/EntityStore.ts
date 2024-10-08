@@ -64,7 +64,7 @@ export class EntityStore<T> {
      * 
      * Executes a provided function once per each key/value pair in the Map, in insertion order.
      */
-    forEach(callbackfn: (value: T, key: string, map: Map<string, T>) => void, thisArg?: any): void {
+    forEach(callbackfn: (value: T, key: string, map: Map<string, T>) => void, _thisArg?: any): void {
         this.map.forEach(callbackfn)
     }
 

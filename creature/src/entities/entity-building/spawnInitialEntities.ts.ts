@@ -115,7 +115,7 @@ function spawnStartingViruses(engine: Matter.Engine, viewport: Viewport, critter
 
 }
 
-function spawnStartingCritters(critterFactory: CritterFactory, rng: Random, critters: EntityStore<Critter>) {
+function spawnStartingCritters(critterFactory: CritterFactory, _rng: Random, critters: EntityStore<Critter>) {
 
     //start w/ one STRONG guy
     let newCritter = critterFactory.create({

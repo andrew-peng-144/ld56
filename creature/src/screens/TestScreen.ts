@@ -468,10 +468,9 @@ Scroll - Zoom
             Viruses defeated: ${this.numVirusesDefeated}
             `
             this.gameOverText.visible = true
-            this.gameTime -= time.deltaMS
         }
         // victory
-        if (this.virusCount <= 0) {
+        else if (this.virusCount <= 0) {
             this.victoryText.text = `VICTORY!
             Time: ${Math.floor(this.gameTime / 1000)}
             Critters lost: ${this.numCrittersLost}
@@ -480,13 +479,16 @@ Scroll - Zoom
             KING: ${this.critters.search(critter => critter.name === Settings.CritterNames.YELLOW).length > 0 ? "ALIVE!" : "DEAD..."}
             `
             this.victoryText.visible = true
-            this.gameTime -= time.deltaMS
+        
 
+        }
+        else {
+            this.gameTime += time.deltaMS
         }
         // num critters
         this.numCrittersText.text = `${this.critters.size()}`
         // timer
-        this.timerText.text = `${this.gameTime}`
+        this.timerText.text = `${Math.floor(this.gameTime / 1000)}`
 
 
 
@@ -600,7 +602,6 @@ Scroll - Zoom
 
         // loop thru each projectile
         this.virusCount = 0
-        let destroyedSomething = false
         this.projectiles.forEach((projectile: Projectile, id: string) => {
             if (projectile.isVirus) {
                 this.virusCount++
@@ -632,7 +633,6 @@ Scroll - Zoom
                 }
                 this.projectileFactory.destroy(projectile)
                 this.projectiles.remove(id)
-                destroyedSomething = true
             }
         })
         // if (this.virusCount === 0 && destroyedSomething) {
@@ -679,7 +679,7 @@ gameTime(${this.gameTime})
         // debugBody1(${this.debugBody1.position.x},${this.debugBody1.position.y})
 
 
-        this.gameTime += time.deltaMS
+
     }
 
 }

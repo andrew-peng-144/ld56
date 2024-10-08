@@ -1,5 +1,5 @@
 import Matter from "matter-js"
-import { Graphics, Container, Geometry, Ticker, Sprite } from "pixi.js"
+import { Graphics, Container, Ticker, Sprite } from "pixi.js"
 import { Critter } from "./CritterFactory"
 import { Settings } from "../Settings"
 

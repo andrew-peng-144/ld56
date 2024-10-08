@@ -1,5 +1,5 @@
 import Matter from "matter-js"
-import { Graphics, Container, Geometry } from "pixi.js"
+import { Graphics, Container } from "pixi.js"
 import { Settings } from "../Settings"
 
 export class CritterFactory {
@@ -107,8 +107,6 @@ export class Critter {
 
         this.color = settings.color
         // default body
-        const triangleWidth = 40
-        const triangleHeight = 65
         const radius = 15 * (settings.scale || 1) //MMATTER coords
         if (!settings.body) {
 
