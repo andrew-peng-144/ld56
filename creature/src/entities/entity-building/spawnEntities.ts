@@ -79,35 +79,35 @@ export function spawnViruses(strength: number, spawnRadiusMultMin: number, spawn
     switch (strength) {
         case 1:
             intervalMs = 10000
-            projectileSpeed = 7.1
+            projectileSpeed = 7
             hp = rng.integer(1, 2)
             scale = 5
             color = 0x9999ff
             break;
         case 2:
             intervalMs = 4000
-            projectileSpeed = 3.5
+            projectileSpeed = 8
             hp = rng.integer(5,15)
             scale = 5
             color = 0x66ff99
             break;
         case 3:
             intervalMs = 7000
-            projectileSpeed = 7.1
+            projectileSpeed = 10
             hp = rng.integer(10,20)
             scale = 6
             color = 0xbdbf24
             break;
         case 4:
             intervalMs = 2000
-            projectileSpeed = 5.0
+            projectileSpeed = 12
             hp = rng.integer(15, 30)
             scale = 7
             color = 0xff6600
             break;
         default:
             intervalMs = 30000
-            projectileSpeed = 3.1
+            projectileSpeed = 14.0
             hp = rng.integer(20, 40)
             scale = 8
             color = 0xbf00ff

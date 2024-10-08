@@ -420,7 +420,7 @@ Scroll - Zoom
                 virusStrength = 4
                 virusSpawnRadiusMultMin = 0.1
                 virusSpawnRadiusMultMax = 0.8
-                critterCount = 15
+                critterCount = 10
                 critterSpawnRadiusMultMin = 0.1
                 critterSpawnRadiusMultMax = 0.8
             }
@@ -428,7 +428,7 @@ Scroll - Zoom
                 virusStrength = 5
                 virusSpawnRadiusMultMin = 0.1
                 virusSpawnRadiusMultMax = 0.8
-                critterCount = 18
+                critterCount = 10
                 critterSpawnRadiusMultMin = 0.1
                 critterSpawnRadiusMultMax = 0.8
             }
