@@ -131,7 +131,7 @@ export function makeVirus1(settings: VirusSettings,
         if (msCounterShoot >= currInteval) {
             msCounterShoot -= currInteval
             //debugger
-            currInteval = 2000 + rng.realZeroToOneExclusive() * 10000
+            //currInteval = 2000 + rng.realZeroToOneExclusive() * 10000
 
 
             Matter.Body.setPosition(virusVision, virusBody.position)

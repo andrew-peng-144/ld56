@@ -404,7 +404,7 @@ Scroll - Zoom
                 virusStrength = 2
                 virusSpawnRadiusMultMin = 0.1
                 virusSpawnRadiusMultMax = 0.45
-                critterCount = 10
+                critterCount = 6
                 critterSpawnRadiusMultMin = 0.1
                 critterSpawnRadiusMultMax = 0.3
             }
@@ -412,7 +412,7 @@ Scroll - Zoom
                 virusStrength = 3
                 virusSpawnRadiusMultMin = 0.1
                 virusSpawnRadiusMultMax = 0.6
-                critterCount = 15
+                critterCount = 9
                 critterSpawnRadiusMultMin = 0.1
                 critterSpawnRadiusMultMax = 0.6
             }
@@ -420,7 +420,7 @@ Scroll - Zoom
                 virusStrength = 4
                 virusSpawnRadiusMultMin = 0.1
                 virusSpawnRadiusMultMax = 0.8
-                critterCount = 20
+                critterCount = 15
                 critterSpawnRadiusMultMin = 0.1
                 critterSpawnRadiusMultMax = 0.8
             }
@@ -428,7 +428,7 @@ Scroll - Zoom
                 virusStrength = 5
                 virusSpawnRadiusMultMin = 0.1
                 virusSpawnRadiusMultMax = 0.8
-                critterCount = 30
+                critterCount = 18
                 critterSpawnRadiusMultMin = 0.1
                 critterSpawnRadiusMultMax = 0.8
             }
